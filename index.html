@@ -107,10 +107,10 @@ li {
 
   <div class="card">
     <div id="time">25:00</div>
-    <button onclick="startTimer();">Start</button>
-    <button onclick="pauseTimer()">Pause</button>
-    <button onclick="resetTimer()">Reset</button>
-    <button onclick="toggleFocus()">Focus Mode</button>
+    <button onclick="startTimer() playBeep();">Start</button>
+    <button onclick="pauseTimer() playBeep();">Pause</button>
+    <button onclick="resetTimer() playBeep();">Reset</button>
+    <button onclick="toggleFocus() playBeep();">Focus Mode</button>
   </div>
 
   <div class="card">
@@ -137,15 +137,7 @@ function updateDisplay() {
   document.getElementById("time").innerText =
     m + ":" + (s<10?"0"+s:s);
 }
-
-function playBeep() {
-  let ctx = new (window.AudioContext || window.webkitAudioContext)();
-  let osc = ctx.createOscillator();
-  osc.connect(ctx.destination);
-  osc.start();
-  setTimeout(()=>osc.stop(),200);
-}
-
+  
 function completeSession() {
   playBeep();
 
