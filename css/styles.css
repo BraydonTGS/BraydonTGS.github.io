@@ -1,4 +1,23 @@
-html{
-    font-family: IBM Plex Mono;
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #111;
+  color: white;
 }
 
+.timer {
+  margin: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+}
+
+.tasks {
+  margin-top: 20px;
+}
+
+li {
+  cursor: pointer;
+}
