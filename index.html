@@ -1,28 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Brain Stew</title>
-  <link rel="stylesheet" href="css/styles.css" />
-  <script src="js/app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #020617, #0f172a);
+      color: #e2e8f0;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: #22c55e;
+      text-shadow: 0 0 20px #22c55e;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid #22c55e33;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 25px #22c55e22;
+    }
+
+    #time {
+      font-size: 60px;
+      color: #38bdf8;
+      text-shadow: 0 0 20px #38bdf8;
+      margin: 10px 0;
+    }
+
+    button {
+      background: none;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #38bdf8;
+      color: #020617;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+
+    input {
+      width: 70%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #22c55e55;
+      background: #020617;
+      color: white;
+    }
+
+    li {
+      list-style: none;
+      padding: 10px;
+      margin-top: 5px;
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #38bdf822;
+      cursor: pointer;
+    }
+
+    li:hover {
+      background: #38bdf8;
+      color: black;
+    }
+  </style>
 </head>
 <body>
 
-<h1>🧠 Brain Stew</h1>
+<h1>🧠 BRAIN STEW</h1>
+<p style="opacity:0.6;">focus. drift. repeat.</p>
 
-<div class="timer">
-  <h2 id="time">25:00</h2>
-  <button onclick="startTimer()">Start</button>
-  <button onclick="pauseTimer()">Pause</button>
-  <button onclick="resetTimer()">Reset</button>
+<div class="container">
+
+  <div class="card">
+    <div id="time">25:00</div>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+
+  <div class="card">
+    <input id="taskInput" placeholder="Add a task..." />
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
+
 </div>
 
-<div class="tasks">
-  <input id="taskInput" placeholder="Add a task..." />
-  <button onclick="addTask()">Add</button>
-  <ul id="taskList"></ul>
-</div>
+<script>
+let time = 1500;
+let timer = null;
 
-<script src="app.js"></script>
+function updateDisplay() {
+  let m = Math.floor(time / 60);
+  let s = time % 60;
+  document.getElementById("time").innerText =
+    m + ":" + (s < 10 ? "0" + s : s);
+}
+
+function startTimer() {
+  if (timer) return;
+
+  timer = setInterval(() => {
+    time--;
+    updateDisplay();
+
+    if (time <= 0) {
+      clearInterval(timer);
+      timer = null;
+      alert("Session complete 🔥");
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timer);
+  timer = null;
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timer = null;
+  time = 1500;
+  updateDisplay();
+}
+
+// TASKS
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+function renderTasks() {
+  let list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  tasks.forEach((t, i) => {
+    let li = document.createElement("li");
+    li.innerText = t;
+    li.onclick = () => {
+      tasks.splice(i, 1);
+      save();
+    };
+    list.appendChild(li);
+  });
+}
+
+function addTask() {
+  let input = document.getElementById("taskInput");
+  if (!input.value) return;
+
+  tasks.push(input.value);
+  input.value = "";
+  save();
+}
+
+function save() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  renderTasks();
+}
+
+updateDisplay();
+renderTasks();
+</script>
+
 </body>
 </html>
