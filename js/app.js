@@ -122,6 +122,7 @@ if ('serviceWorker' in navigator) {
   const swURL = URL.createObjectURL(blob);
   navigator.serviceWorker.register(swURL);
 }
+
 function playBeep() {
   // Only create AudioContext on first user gesture
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -144,3 +145,4 @@ function playBeep() {
 updateDisplay();
 renderTasks();
 updateStats();
+playBeep();
