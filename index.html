@@ -105,8 +105,6 @@ input {
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
-
-// ✅ Updated working proxy
 const PROXY = "https://corsproxy.io/?";
 
 input.addEventListener("keypress", async (e) => {
@@ -119,7 +117,7 @@ async function searchCards(query) {
   resultsEl.innerHTML = "";
   loader.innerText = "Scanning the marketplace...";
 
-  const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
+  const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1&_ipg=25`;
 
   try {
     const res = await fetch(PROXY + encodeURIComponent(ebayUrl));
@@ -168,7 +166,6 @@ async function searchCards(query) {
       return;
     }
 
-    // 📊 Price analytics
     prices.sort((a, b) => a - b);
 
     const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
@@ -188,7 +185,6 @@ async function searchCards(query) {
 
     resultsEl.appendChild(summary);
 
-    // 🃏 Render cards
     cards.slice(0, 12).forEach(card => {
       const div = document.createElement("div");
       div.className = "card";
