@@ -127,47 +127,30 @@ input {
 
 <script>
 const data = [
-  {
-    name: "Michael Jordan 1986 Fleer PSA 9",
-    price: 15200,
-    img: "https://picsum.photos/300/200?random=1"
-  },
-  {
-    name: "LeBron James Rookie PSA 10",
-    price: 2500,
-    img: "https://picsum.photos/300/200?random=2"
-  },
-  {
-    name: "Tom Brady Rookie PSA 10",
-    price: 4200,
-    img: "https://picsum.photos/300/200?random=3"
-  },
-  {
-    name: "Kobe Bryant Topps Rookie PSA 10",
-    price: 3300,
-    img: "https://picsum.photos/300/200?random=4"
-  },
-  {
-    name: "Shohei Ohtani Rookie Auto",
-    price: 1800,
-    img: "https://picsum.photos/300/200?random=5"
-  },
-  {
-    name: "Patrick Mahomes Rookie Patch Auto",
-    price: 5500,
-    img: "https://picsum.photos/300/200?random=6"
-  }
+  { name: "Michael Jordan 1986 Fleer PSA 9", price: 15200, img: "https://picsum.photos/300/200?random=1" },
+  { name: "LeBron James Rookie PSA 10", price: 2500, img: "https://picsum.photos/300/200?random=2" },
+  { name: "Tom Brady Rookie PSA 10", price: 4200, img: "https://picsum.photos/300/200?random=3" },
+  { name: "Kobe Bryant Topps Rookie PSA 10", price: 3300, img: "https://picsum.photos/300/200?random=4" },
+  { name: "Shohei Ohtani Rookie Auto", price: 1800, img: "https://picsum.photos/300/200?random=5" },
+  { name: "Patrick Mahomes Rookie Patch Auto", price: 5500, img: "https://picsum.photos/300/200?random=6" }
 ];
 
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const summaryEl = document.getElementById("summary");
 
-// INITIAL LOAD
-render(data);
+// Initial empty state
+resultsEl.innerHTML = "<p style='opacity:0.6;text-align:center;margin-top:40px;'>Search for a slab to begin...</p>";
 
 input.addEventListener("input", () => {
-  const query = input.value.toLowerCase();
+  const query = input.value.toLowerCase().trim();
+
+  // If empty → reset to nothing
+  if (!query) {
+    resultsEl.innerHTML = "<p style='opacity:0.6;text-align:center;margin-top:40px;'>Search for a slab to begin...</p>";
+    summaryEl.innerHTML = "";
+    return;
+  }
 
   const filtered = data.filter(card =>
     card.name.toLowerCase().includes(query)
