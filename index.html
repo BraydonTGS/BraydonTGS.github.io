@@ -6,98 +6,85 @@
 <title>Neon Slab</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: 'Courier New', monospace;
-    background: radial-gradient(circle at top, #020617, #000);
-    color: #22c55e;
-    text-align: center;
-  }
+body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  background: radial-gradient(circle at top, #020617, #000);
+  color: #0ff;
+  text-align: center;
+}
 
-  h1 {
-    margin-top: 30px;
-    font-size: 3em;
-    color: #0ff;
-    text-shadow: 0 0 20px #0ff;
-  }
+h1 {
+  margin-top: 30px;
+  font-size: 3em;
+  text-shadow: 0 0 20px #0ff;
+}
 
-  .search-container {
-    margin: 30px auto;
-    width: 90%;
-    max-width: 500px;
-  }
+.search-container {
+  margin: 30px auto;
+  width: 90%;
+  max-width: 500px;
+}
 
-  input {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.2em;
-    border-radius: 10px;
-    border: 2px solid #0ff;
-    background: #020617;
-    color: #0ff;
-    outline: none;
-    box-shadow: 0 0 10px #0ff;
-  }
+input {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2em;
+  border-radius: 10px;
+  border: 2px solid #0ff;
+  background: #020617;
+  color: #0ff;
+  box-shadow: 0 0 10px #0ff;
+}
 
-  input::placeholder {
-    color: #0ff88a;
-  }
+.results {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
 
-  .results {
-    margin-top: 30px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
+.card {
+  background: rgba(2,6,23,0.9);
+  border: 1px solid #0ff;
+  border-radius: 12px;
+  padding: 15px;
+  width: 250px;
+  text-align: left;
+  box-shadow: 0 0 15px #0ff;
+}
 
-  .card {
-    background: rgba(2,6,23,0.9);
-    border: 1px solid #0ff;
-    border-radius: 12px;
-    padding: 15px;
-    width: 220px;
-    text-align: left;
-    box-shadow: 0 0 15px #0ff;
-    transition: 0.2s;
-  }
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
 
-  .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px #0ff;
-  }
+.price {
+  color: #22c55e;
+  font-weight: bold;
+}
 
-  .card-title {
-    font-size: 1.1em;
-    color: #38bdf8;
-    margin-bottom: 10px;
-  }
+.loader {
+  margin-top: 20px;
+}
 
-  .price {
-    color: #22c55e;
-    font-weight: bold;
-  }
+.grid {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(#0ff1 1px, transparent 1px),
+                    linear-gradient(90deg, #0ff1 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -1;
+  animation: moveGrid 10s linear infinite;
+}
 
-  .no-results {
-    margin-top: 30px;
-    color: #f43f5e;
-  }
-
-  .grid {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(#0ff1 1px, transparent 1px),
-                      linear-gradient(90deg, #0ff1 1px, transparent 1px);
-    background-size: 40px 40px;
-    z-index: -1;
-    animation: moveGrid 10s linear infinite;
-  }
-
-  @keyframes moveGrid {
-    from { transform: translateY(0); }
-    to { transform: translateY(40px); }
-  }
+@keyframes moveGrid {
+  from { transform: translateY(0); }
+  to { transform: translateY(40px); }
+}
 </style>
 </head>
 
@@ -108,52 +95,73 @@
 <h1>Neon Slab 🔮</h1>
 
 <div class="search-container">
-  <input id="searchInput" placeholder="Search cards (e.g. 'LeBron rookie')" />
+  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan rookie PSA')" />
 </div>
 
+<div class="loader" id="loader"></div>
 <div class="results" id="results"></div>
-<div class="no-results" id="noResults"></div>
 
 <script>
-const mockData = [
-  { name: "LeBron James Rookie Card PSA 10", price: "$2,500" },
-  { name: "Michael Jordan Fleer 1986 PSA 9", price: "$15,000" },
-  { name: "Tom Brady Rookie Card PSA 10", price: "$4,200" },
-  { name: "Shohei Ohtani Rookie Auto", price: "$1,800" },
-  { name: "Kobe Bryant Topps Rookie PSA 10", price: "$3,300" },
-  { name: "Patrick Mahomes Rookie Patch Auto", price: "$5,500" }
-];
-
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
-const noResultsEl = document.getElementById("noResults");
+const loader = document.getElementById("loader");
 
-input.addEventListener("input", () => {
-  const query = input.value.toLowerCase().trim();
-  resultsEl.innerHTML = "";
-  noResultsEl.innerText = "";
+// Proxy to bypass CORS (demo only)
+const PROXY = "https://api.allorigins.win/raw?url=";
 
-  if (!query) return;
-
-  const filtered = mockData.filter(card =>
-    card.name.toLowerCase().includes(query)
-  );
-
-  if (filtered.length === 0) {
-    noResultsEl.innerText = "No slabs found in the system...";
-    return;
+input.addEventListener("keypress", async (e) => {
+  if (e.key === "Enter") {
+    searchCards(input.value);
   }
-
-  filtered.forEach(card => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <div class="card-title">${card.name}</div>
-      <div class="price">${card.price}</div>
-    `;
-    resultsEl.appendChild(div);
-  });
 });
+
+async function searchCards(query) {
+  resultsEl.innerHTML = "";
+  loader.innerText = "Scanning the marketplace...";
+
+  const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
+
+  try {
+    const res = await fetch(PROXY + encodeURIComponent(ebayUrl));
+    const html = await res.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const items = doc.querySelectorAll(".s-item");
+
+    loader.innerText = "";
+
+    items.forEach((item, index) => {
+      if (index > 11) return;
+
+      const title = item.querySelector(".s-item__title")?.innerText;
+      const price = item.querySelector(".s-item__price")?.innerText;
+      const img = item.querySelector(".s-item__image-img")?.src;
+
+      if (!title || !price) return;
+
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        <img src="${img}" />
+        <div>${title}</div>
+        <div class="price">${price}</div>
+      `;
+
+      resultsEl.appendChild(div);
+    });
+
+    if (resultsEl.innerHTML === "") {
+      loader.innerText = "No slabs found...";
+    }
+
+  } catch (err) {
+    loader.innerText = "Error accessing data stream ⚠️";
+    console.error(err);
+  }
+}
 </script>
 
 </body>
