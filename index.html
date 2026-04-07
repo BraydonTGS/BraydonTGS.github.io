@@ -100,11 +100,13 @@ input {
 
 <div class="loader" id="loader"></div>
 <div class="results" id="results"></div>
+
 <script>
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
 
+// ✅ Updated working proxy
 const PROXY = "https://corsproxy.io/?";
 
 input.addEventListener("keypress", async (e) => {
@@ -126,7 +128,7 @@ async function searchCards(query) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    const items = doc.querySelectorAll(".s-item");
+    const items = doc.querySelectorAll("li.s-item");
 
     let prices = [];
     let cards = [];
@@ -134,14 +136,17 @@ async function searchCards(query) {
     items.forEach((item) => {
       const title = item.querySelector(".s-item__title")?.innerText;
       const priceText = item.querySelector(".s-item__price")?.innerText;
-      const img = item.querySelector(".s-item__image-img")?.src;
+      const img = item.querySelector("img")?.src;
 
       if (!title || !priceText) return;
 
-      // Remove junk listings
-      if (title.toLowerCase().includes("lot") || title.toLowerCase().includes("reprint")) return;
+      // Filter junk
+      if (
+        title.toLowerCase().includes("shop on ebay") ||
+        title.toLowerCase().includes("reprint") ||
+        title.toLowerCase().includes("lot")
+      ) return;
 
-      // Extract numeric price
       const priceMatch = priceText.replace(/,/g, "").match(/\d+(\.\d+)?/);
       if (!priceMatch) return;
 
@@ -163,7 +168,7 @@ async function searchCards(query) {
       return;
     }
 
-    // --- PRICE ANALYTICS ---
+    // 📊 Price analytics
     prices.sort((a, b) => a - b);
 
     const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
@@ -175,7 +180,7 @@ async function searchCards(query) {
     summary.className = "card";
     summary.style.border = "2px solid #22c55e";
     summary.innerHTML = `
-      <div class="card-title">Market Summary</div>
+      <div style="color:#22c55e;font-weight:bold;margin-bottom:10px;">Market Summary</div>
       <div>Avg Price: <span class="price">$${avg}</span></div>
       <div>Median Price: <span class="price">$${median}</span></div>
       <div>Sales Count: ${prices.length}</div>
@@ -183,7 +188,7 @@ async function searchCards(query) {
 
     resultsEl.appendChild(summary);
 
-    // --- RENDER CARDS ---
+    // 🃏 Render cards
     cards.slice(0, 12).forEach(card => {
       const div = document.createElement("div");
       div.className = "card";
@@ -203,5 +208,6 @@ async function searchCards(query) {
   }
 }
 </script>
+
 </body>
 </html>
