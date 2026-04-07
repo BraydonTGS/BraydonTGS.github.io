@@ -147,7 +147,8 @@ const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
 
-const PROXY = "https://corsproxy.io/?";
+// 👇 KEEP your proxy (commented out for later use)
+// const PROXY = "https://corsproxy.io/?";
 
 input.addEventListener("keypress", async (e) => {
   if (e.key === "Enter") {
@@ -159,6 +160,10 @@ async function searchCards(query) {
   resultsEl.innerHTML = "";
   loader.innerText = "Scanning the marketplace...";
 
+  // =====================================================
+  // 🚫 REAL API CALL (COMMENTED OUT FOR NOW)
+  // =====================================================
+  /*
   const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
 
   try {
@@ -169,80 +174,102 @@ async function searchCards(query) {
     const doc = parser.parseFromString(html, "text/html");
 
     const items = doc.querySelectorAll(".s-item");
-
-    let prices = [];
-    let cards = [];
-
-    items.forEach((item) => {
-      const title = item.querySelector(".s-item__title")?.innerText;
-      const priceText = item.querySelector(".s-item__price")?.innerText;
-      const img = item.querySelector(".s-item__image-img")?.src;
-
-      if (!title || !priceText) return;
-
-      // Remove junk listings
-      if (title.toLowerCase().includes("lot") || title.toLowerCase().includes("reprint")) return;
-
-      // Extract numeric price
-      const priceMatch = priceText.replace(/,/g, "").match(/\d+(\.\d+)?/);
-      if (!priceMatch) return;
-
-      const price = parseFloat(priceMatch[0]);
-
-      prices.push(price);
-
-      cards.push({
-        title,
-        priceText,
-        img
-      });
-    });
-
-    loader.innerText = "";
-
-    if (cards.length === 0) {
-      loader.innerText = "No slabs found...";
-      return;
-    }
-
-    // --- PRICE ANALYTICS ---
-    prices.sort((a, b) => a - b);
-
-    const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
-    const median = prices.length % 2 !== 0
-      ? prices[Math.floor(prices.length / 2)]
-      : ((prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2).toFixed(2);
-
-    const summary = document.createElement("div");
-    summary.className = "card";
-    summary.style.border = "2px solid #22c55e";
-    summary.innerHTML = `
-      <div class="card-title">Market Summary</div>
-      <div>Avg Price: <span class="price">$${avg}</span></div>
-      <div>Median Price: <span class="price">$${median}</span></div>
-      <div>Sales Count: ${prices.length}</div>
-    `;
-
-    resultsEl.appendChild(summary);
-
-    // --- RENDER CARDS ---
-    cards.slice(0, 12).forEach(card => {
-      const div = document.createElement("div");
-      div.className = "card";
-
-      div.innerHTML = `
-        <img src="${card.img}" />
-        <div>${card.title}</div>
-        <div class="price">${card.priceText}</div>
-      `;
-
-      resultsEl.appendChild(div);
-    });
-
+    // parsing logic...
   } catch (err) {
     loader.innerText = "Error accessing data stream ⚠️";
     console.error(err);
   }
+  */
+
+  // =====================================================
+  // ✅ DUMMY DATA (USED FOR NOW)
+  // =====================================================
+
+  const dummyData = [
+    {
+      title: "Michael Jordan 1986 Fleer PSA 9",
+      price: "$15,200",
+      img: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400"
+    },
+    {
+      title: "LeBron James Rookie PSA 10",
+      price: "$2,500",
+      img: "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=400"
+    },
+    {
+      title: "Kobe Bryant Topps Rookie PSA 10",
+      price: "$3,300",
+      img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400"
+    },
+    {
+      title: "Tom Brady Rookie PSA 10",
+      price: "$4,200",
+      img: "https://images.unsplash.com/photo-1606813906975-5b9b3c8a9d55?w=400"
+    },
+    {
+      title: "Shohei Ohtani Rookie Auto",
+      price: "$1,800",
+      img: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400"
+    },
+    {
+      title: "Patrick Mahomes Rookie Patch Auto",
+      price: "$5,500",
+      img: "https://images.unsplash.com/photo-1606813906975-5b9b3c8a9d55?w=400"
+    }
+  ];
+
+  // simulate network delay
+  await new Promise(r => setTimeout(r, 400));
+
+  loader.innerText = "";
+
+  // simple filter based on search
+  const filtered = dummyData.filter(card =>
+    card.title.toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    loader.innerText = "No slabs found...";
+    return;
+  }
+
+  // --- PRICE ANALYTICS ---
+  const prices = filtered.map(c =>
+    parseFloat(c.price.replace(/[$,]/g, ""))
+  );
+
+  prices.sort((a, b) => a - b);
+
+  const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
+  const median = prices.length % 2 !== 0
+    ? prices[Math.floor(prices.length / 2)]
+    : ((prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2).toFixed(2);
+
+  const summary = document.createElement("div");
+  summary.className = "card";
+  summary.style.border = "2px solid #22c55e";
+  summary.innerHTML = `
+    <div style="color:#22c55e;font-weight:bold;margin-bottom:8px;">Market Summary</div>
+    <div>Avg: <span class="price">$${avg}</span></div>
+    <div>Median: <span class="price">$${median}</span></div>
+    <div>Sales: ${prices.length}</div>
+  `;
+
+  resultsEl.appendChild(summary);
+
+  // --- RENDER CARDS ---
+  filtered.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <img src="${card.img}" />
+      <div>${card.title}</div>
+      <div class="price">${card.price}</div>
+    `;
+
+    resultsEl.appendChild(div);
+  });
 }
 </script>
 </body>
