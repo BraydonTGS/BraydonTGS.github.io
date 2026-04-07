@@ -12,83 +12,122 @@ body {
   background: radial-gradient(circle at top, #020617, #000);
   color: #0ff;
   text-align: center;
-  padding: 10px;
+  padding: 0 10px 40px 10px;
 }
 
-/* HEADER */
 h1 {
-  margin-top: 15px;
+  margin-top: 20px;
   font-size: 2.2em;
   text-shadow: 0 0 15px #0ff;
 }
 
 /* SEARCH */
 .search-container {
-  margin: 20px auto;
+  margin: 15px auto;
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
 }
 
 input {
   width: 100%;
-  padding: 12px;
+  padding: 12px 15px;
   font-size: 1em;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 2px solid #0ff;
   background: #020617;
   color: #0ff;
-  box-shadow: 0 0 8px #0ff;
+  box-shadow: 0 0 10px #0ff;
+  outline: none;
+  transition: 0.2s;
 }
 
-/* RESULTS GRID (key change) */
+input:focus {
+  box-shadow: 0 0 20px #38bdf8;
+  border-color: #38bdf8;
+}
+
+/* RESULTS GRID */
 .results {
-  margin-top: 20px;
+  margin-top: 25px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  padding: 0 5px;
+  gap: 15px;
+  justify-items: center;
+  padding-bottom: 30px;
 }
 
 /* CARD */
 .card {
-  background: rgba(2,6,23,0.9);
-  border: 1px solid #0ff;
-  border-radius: 12px;
-  padding: 10px;
-  text-align: left;
-  box-shadow: 0 0 10px #0ff;
-  transition: 0.2s;
+  background: rgba(2,6,23,0.95);
+  border: 2px solid #0ff;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 220px;
+  box-shadow: 0 0 15px #0ff;
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s;
 }
 
 .card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 18px #0ff;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 25px #38bdf8;
 }
 
 .card img {
   width: 100%;
-  height: 120px;
+  height: 180px;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-bottom: 2px solid #0ff;
 }
 
-/* TEXT */
-.card div {
-  font-size: 0.8em;
+/* CARD BODY */
+.card .title {
+  padding: 10px;
+  font-weight: bold;
+  font-size: 0.95em;
+  margin-bottom: 6px;
+  min-height: 42px;
 }
 
-.price {
+.card .price {
+  padding: 0 10px 10px 10px;
   color: #22c55e;
   font-weight: bold;
   font-size: 1em;
-  margin-top: 4px;
+}
+
+/* MARKET SUMMARY CARD */
+.summary {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(2,6,23,0.95);
+  border: 2px solid #22c55e;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 15px #22c55e;
+}
+
+.summary div {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.summary div .price {
+  font-size: 1em;
 }
 
 /* LOADER */
 .loader {
   margin-top: 15px;
   font-size: 0.9em;
+  opacity: 0.8;
 }
 
 /* BACKGROUND GRID */
@@ -108,30 +147,17 @@ input {
   to { transform: translateY(40px); }
 }
 
-/* EXTRA MOBILE POLISH */
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.8em;
-  }
-
-  input {
-    font-size: 0.95em;
-    padding: 10px;
-  }
-
-  .card img {
-    height: 100px;
-  }
-
-  .card div {
-    font-size: 0.75em;
-  }
+/* MOBILE OPTIMIZATION */
+@media (max-width: 400px) {
+  h1 { font-size: 1.8em; }
+  .card img { height: 140px; }
+  .card .title { font-size: 0.85em; min-height: 36px; }
+  .summary { flex-direction: column; gap: 8px; padding: 10px; }
 }
 </style>
 </head>
 
 <body>
-
 <div class="grid"></div>
 
 <h1>Neon Slab 🔮</h1>
@@ -142,12 +168,13 @@ input {
 
 <div class="loader" id="loader"></div>
 <div class="results" id="results"></div>
+
 <script>
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
 
-// 👇 KEEP your proxy (commented out for later use)
+// API call placeholder (commented for now)
 // const PROXY = "https://corsproxy.io/?";
 
 input.addEventListener("keypress", async (e) => {
@@ -160,114 +187,58 @@ async function searchCards(query) {
   resultsEl.innerHTML = "";
   loader.innerText = "Scanning the marketplace...";
 
-  // =====================================================
-  // 🚫 REAL API CALL (COMMENTED OUT FOR NOW)
-  // =====================================================
+  // 🚫 REAL API CALL COMMENTED
   /*
-  const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
-
   try {
+    const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
     const res = await fetch(PROXY + encodeURIComponent(ebayUrl));
     const html = await res.text();
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    const items = doc.querySelectorAll(".s-item");
-    // parsing logic...
-  } catch (err) {
+    // parse html...
+  } catch(err) {
     loader.innerText = "Error accessing data stream ⚠️";
     console.error(err);
   }
   */
 
-  // =====================================================
-  // ✅ DUMMY DATA (USED FOR NOW)
-  // =====================================================
-
+  // ✅ DUMMY DATA FOR NOW
   const dummyData = [
-    {
-      title: "Michael Jordan 1986 Fleer PSA 9",
-      price: "$15,200",
-      img: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400"
-    },
-    {
-      title: "LeBron James Rookie PSA 10",
-      price: "$2,500",
-      img: "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=400"
-    },
-    {
-      title: "Kobe Bryant Topps Rookie PSA 10",
-      price: "$3,300",
-      img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400"
-    },
-    {
-      title: "Tom Brady Rookie PSA 10",
-      price: "$4,200",
-      img: "https://images.unsplash.com/photo-1606813906975-5b9b3c8a9d55?w=400"
-    },
-    {
-      title: "Shohei Ohtani Rookie Auto",
-      price: "$1,800",
-      img: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400"
-    },
-    {
-      title: "Patrick Mahomes Rookie Patch Auto",
-      price: "$5,500",
-      img: "https://images.unsplash.com/photo-1606813906975-5b9b3c8a9d55?w=400"
-    }
+    {title:"Michael Jordan 1986 Fleer PSA 9", price:"$15,200", img:"https://picsum.photos/300/200?random=1"},
+    {title:"LeBron James Rookie PSA 10", price:"$2,500", img:"https://picsum.photos/300/200?random=2"},
+    {title:"Kobe Bryant Topps Rookie PSA 10", price:"$3,300", img:"https://picsum.photos/300/200?random=3"},
+    {title:"Tom Brady Rookie PSA 10", price:"$4,200", img:"https://picsum.photos/300/200?random=4"},
+    {title:"Shohei Ohtani Rookie Auto", price:"$1,800", img:"https://picsum.photos/300/200?random=5"},
+    {title:"Patrick Mahomes Rookie Patch Auto", price:"$5,500", img:"https://picsum.photos/300/200?random=6"}
   ];
 
-  // simulate network delay
   await new Promise(r => setTimeout(r, 400));
-
   loader.innerText = "";
 
-  // simple filter based on search
-  const filtered = dummyData.filter(card =>
-    card.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const filtered = dummyData.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+  if(filtered.length===0){ loader.innerText="No slabs found..."; return; }
 
-  if (filtered.length === 0) {
-    loader.innerText = "No slabs found...";
-    return;
-  }
+  const prices = filtered.map(c=>parseFloat(c.price.replace(/[$,]/g,'')));
+  prices.sort((a,b)=>a-b);
+  const avg = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(0);
+  const median = prices.length % 2 ? prices[Math.floor(prices.length/2)] : ((prices[prices.length/2-1]+prices[prices.length/2])/2).toFixed(0);
 
-  // --- PRICE ANALYTICS ---
-  const prices = filtered.map(c =>
-    parseFloat(c.price.replace(/[$,]/g, ""))
-  );
-
-  prices.sort((a, b) => a - b);
-
-  const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
-  const median = prices.length % 2 !== 0
-    ? prices[Math.floor(prices.length / 2)]
-    : ((prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2).toFixed(2);
-
+  // Market summary
   const summary = document.createElement("div");
-  summary.className = "card";
-  summary.style.border = "2px solid #22c55e";
-  summary.innerHTML = `
-    <div style="color:#22c55e;font-weight:bold;margin-bottom:8px;">Market Summary</div>
-    <div>Avg: <span class="price">$${avg}</span></div>
-    <div>Median: <span class="price">$${median}</span></div>
-    <div>Sales: ${prices.length}</div>
+  summary.className="summary";
+  summary.innerHTML=`
+    <div><div>AVG</div><div class="price">$${avg}</div></div>
+    <div><div>MEDIAN</div><div class="price">$${median}</div></div>
+    <div><div>SALES</div><div class="price">${prices.length}</div></div>
   `;
-
   resultsEl.appendChild(summary);
 
-  // --- RENDER CARDS ---
-  filtered.forEach(card => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
+  filtered.forEach(card=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
       <img src="${card.img}" />
-      <div>${card.title}</div>
+      <div class="title">${card.title}</div>
       <div class="price">${card.price}</div>
     `;
-
     resultsEl.appendChild(div);
   });
 }
