@@ -100,13 +100,11 @@ input {
 
 <div class="loader" id="loader"></div>
 <div class="results" id="results"></div>
-
 <script>
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
 
-// Proxy to bypass CORS (demo only)
 const PROXY = "https://api.allorigins.win/raw?url=";
 
 input.addEventListener("keypress", async (e) => {
@@ -130,32 +128,74 @@ async function searchCards(query) {
 
     const items = doc.querySelectorAll(".s-item");
 
-    loader.innerText = "";
+    let prices = [];
+    let cards = [];
 
-    items.forEach((item, index) => {
-      if (index > 11) return;
-
+    items.forEach((item) => {
       const title = item.querySelector(".s-item__title")?.innerText;
-      const price = item.querySelector(".s-item__price")?.innerText;
+      const priceText = item.querySelector(".s-item__price")?.innerText;
       const img = item.querySelector(".s-item__image-img")?.src;
 
-      if (!title || !price) return;
+      if (!title || !priceText) return;
 
+      // Remove junk listings
+      if (title.toLowerCase().includes("lot") || title.toLowerCase().includes("reprint")) return;
+
+      // Extract numeric price
+      const priceMatch = priceText.replace(/,/g, "").match(/\d+(\.\d+)?/);
+      if (!priceMatch) return;
+
+      const price = parseFloat(priceMatch[0]);
+
+      prices.push(price);
+
+      cards.push({
+        title,
+        priceText,
+        img
+      });
+    });
+
+    loader.innerText = "";
+
+    if (cards.length === 0) {
+      loader.innerText = "No slabs found...";
+      return;
+    }
+
+    // --- PRICE ANALYTICS ---
+    prices.sort((a, b) => a - b);
+
+    const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
+    const median = prices.length % 2 !== 0
+      ? prices[Math.floor(prices.length / 2)]
+      : ((prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2).toFixed(2);
+
+    const summary = document.createElement("div");
+    summary.className = "card";
+    summary.style.border = "2px solid #22c55e";
+    summary.innerHTML = `
+      <div class="card-title">Market Summary</div>
+      <div>Avg Price: <span class="price">$${avg}</span></div>
+      <div>Median Price: <span class="price">$${median}</span></div>
+      <div>Sales Count: ${prices.length}</div>
+    `;
+
+    resultsEl.appendChild(summary);
+
+    // --- RENDER CARDS ---
+    cards.slice(0, 12).forEach(card => {
       const div = document.createElement("div");
       div.className = "card";
 
       div.innerHTML = `
-        <img src="${img}" />
-        <div>${title}</div>
-        <div class="price">${price}</div>
+        <img src="${card.img}" />
+        <div>${card.title}</div>
+        <div class="price">${card.priceText}</div>
       `;
 
       resultsEl.appendChild(div);
     });
-
-    if (resultsEl.innerHTML === "") {
-      loader.innerText = "No slabs found...";
-    }
 
   } catch (err) {
     loader.innerText = "Error accessing data stream ⚠️";
@@ -163,6 +203,5 @@ async function searchCards(query) {
   }
 }
 </script>
-
 </body>
 </html>
