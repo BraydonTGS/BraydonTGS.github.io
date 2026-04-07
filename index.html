@@ -55,12 +55,6 @@ input {
   box-shadow: 0 0 15px #0ff;
 }
 
-.card img {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
 .price {
   color: #22c55e;
   font-weight: bold;
@@ -95,7 +89,7 @@ input {
 <h1>Neon Slab 🔮</h1>
 
 <div class="search-container">
-  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan rookie PSA')" />
+  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan PSA')" />
 </div>
 
 <div class="loader" id="loader"></div>
@@ -105,7 +99,9 @@ input {
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
 const loader = document.getElementById("loader");
-const PROXY = "https://corsproxy.io/?";
+
+// smaller, reliable proxy
+const PROXY = "https://api.allorigins.win/raw?url=";
 
 input.addEventListener("keypress", async (e) => {
   if (e.key === "Enter") {
@@ -117,89 +113,71 @@ async function searchCards(query) {
   resultsEl.innerHTML = "";
   loader.innerText = "Scanning the marketplace...";
 
-  const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1&_ipg=25`;
+  const rssUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&LH_Sold=1&LH_Complete=1&_rss=1`;
 
   try {
-    const res = await fetch(PROXY + encodeURIComponent(ebayUrl));
-    const html = await res.text();
+    const res = await fetch(PROXY + encodeURIComponent(rssUrl));
+    const xmlText = await res.text();
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+    const xml = parser.parseFromString(xmlText, "text/xml");
 
-    const items = doc.querySelectorAll("li.s-item");
+    const items = xml.querySelectorAll("item");
 
     let prices = [];
-    let cards = [];
 
-    items.forEach((item) => {
-      const title = item.querySelector(".s-item__title")?.innerText;
-      const priceText = item.querySelector(".s-item__price")?.innerText;
-      const img = item.querySelector("img")?.src;
+    items.forEach(item => {
+      const title = item.querySelector("title")?.textContent;
+      const description = item.querySelector("description")?.textContent;
 
-      if (!title || !priceText) return;
+      if (!title || !description) return;
 
-      // Filter junk
-      if (
-        title.toLowerCase().includes("shop on ebay") ||
-        title.toLowerCase().includes("reprint") ||
-        title.toLowerCase().includes("lot")
-      ) return;
-
-      const priceMatch = priceText.replace(/,/g, "").match(/\d+(\.\d+)?/);
+      // extract price
+      const priceMatch = description.match(/\$\d+(\.\d+)?/);
       if (!priceMatch) return;
 
-      const price = parseFloat(priceMatch[0]);
-
+      const price = parseFloat(priceMatch[0].replace("$", ""));
       prices.push(price);
 
-      cards.push({
-        title,
-        priceText,
-        img
-      });
-    });
-
-    loader.innerText = "";
-
-    if (cards.length === 0) {
-      loader.innerText = "No slabs found...";
-      return;
-    }
-
-    prices.sort((a, b) => a - b);
-
-    const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
-    const median = prices.length % 2 !== 0
-      ? prices[Math.floor(prices.length / 2)]
-      : ((prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2).toFixed(2);
-
-    const summary = document.createElement("div");
-    summary.className = "card";
-    summary.style.border = "2px solid #22c55e";
-    summary.innerHTML = `
-      <div style="color:#22c55e;font-weight:bold;margin-bottom:10px;">Market Summary</div>
-      <div>Avg Price: <span class="price">$${avg}</span></div>
-      <div>Median Price: <span class="price">$${median}</span></div>
-      <div>Sales Count: ${prices.length}</div>
-    `;
-
-    resultsEl.appendChild(summary);
-
-    cards.slice(0, 12).forEach(card => {
       const div = document.createElement("div");
       div.className = "card";
 
       div.innerHTML = `
-        <img src="${card.img}" />
-        <div>${card.title}</div>
-        <div class="price">${card.priceText}</div>
+        <div>${title}</div>
+        <div class="price">${priceMatch[0]}</div>
       `;
 
       resultsEl.appendChild(div);
     });
 
+    loader.innerText = "";
+
+    if (prices.length === 0) {
+      loader.innerText = "No slabs found...";
+      return;
+    }
+
+    // analytics
+    prices.sort((a,b)=>a-b);
+    const avg = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(2);
+    const median = prices.length % 2
+      ? prices[Math.floor(prices.length/2)]
+      : ((prices[prices.length/2-1]+prices[prices.length/2])/2).toFixed(2);
+
+    const summary = document.createElement("div");
+    summary.className = "card";
+    summary.style.border = "2px solid #22c55e";
+    summary.innerHTML = `
+      <div><strong>Market Summary</strong></div>
+      <div>Avg: <span class="price">$${avg}</span></div>
+      <div>Median: <span class="price">$${median}</span></div>
+      <div>Sales: ${prices.length}</div>
+    `;
+
+    resultsEl.prepend(summary);
+
   } catch (err) {
-    loader.innerText = "Error accessing data stream ⚠️";
+    loader.innerText = "Data stream failed ⚠️";
     console.error(err);
   }
 }
