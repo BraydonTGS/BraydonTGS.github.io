@@ -8,178 +8,222 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Courier New', monospace;
+  font-family: 'Segoe UI', sans-serif;
   background: radial-gradient(circle at top, #020617, #000);
   color: #0ff;
-  text-align: center;
 }
 
+/* HEADER */
 h1 {
-  margin-top: 30px;
-  font-size: 3em;
-  text-shadow: 0 0 20px #0ff;
+  text-align: center;
+  margin: 20px 0 10px;
+  font-size: 2.2em;
+  text-shadow: 0 0 15px #0ff;
 }
 
+/* SEARCH */
 .search-container {
-  margin: 30px auto;
-  width: 90%;
-  max-width: 500px;
+  padding: 0 15px;
 }
 
 input {
   width: 100%;
-  padding: 15px;
-  font-size: 1.2em;
-  border-radius: 10px;
+  padding: 14px;
+  font-size: 1.1em;
+  border-radius: 12px;
   border: 2px solid #0ff;
   background: #020617;
   color: #0ff;
-  box-shadow: 0 0 10px #0ff;
+  box-shadow: 0 0 12px #0ff;
 }
 
-.results {
-  margin-top: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-}
-
-.card {
-  background: rgba(2,6,23,0.9);
-  border: 1px solid #0ff;
-  border-radius: 12px;
+/* SUMMARY */
+.summary {
+  margin: 15px;
   padding: 15px;
-  width: 250px;
-  text-align: left;
-  box-shadow: 0 0 15px #0ff;
+  border-radius: 12px;
+  border: 1px solid #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+/* GRID */
+.results {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* CARD */
+.card {
+  background: linear-gradient(145deg, #020617, #020617);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #0ff;
+  box-shadow: 0 0 10px #0ff;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px #0ff;
+}
+
+/* IMAGE */
+.card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* CONTENT */
+.card-body {
+  padding: 10px;
+}
+
+.title {
+  font-size: 0.8em;
+  margin-bottom: 6px;
+  color: #38bdf8;
 }
 
 .price {
-  color: #22c55e;
+  font-size: 1.1em;
   font-weight: bold;
+  color: #22c55e;
 }
 
-.loader {
-  margin-top: 20px;
-}
+/* MOBILE IMPROVEMENTS */
+@media (max-width: 500px) {
+  .card img {
+    height: 120px;
+  }
 
-.grid {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-image: linear-gradient(#0ff1 1px, transparent 1px),
-                    linear-gradient(90deg, #0ff1 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: -1;
-  animation: moveGrid 10s linear infinite;
-}
+  .title {
+    font-size: 0.75em;
+  }
 
-@keyframes moveGrid {
-  from { transform: translateY(0); }
-  to { transform: translateY(40px); }
+  .price {
+    font-size: 1em;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="grid"></div>
-
 <h1>Neon Slab 🔮</h1>
 
 <div class="search-container">
-  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan PSA')" />
+  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan PSA 10')" />
 </div>
 
-<div class="loader" id="loader"></div>
+<div id="summary"></div>
 <div class="results" id="results"></div>
 
 <script>
+const data = [
+  {
+    name: "Michael Jordan 1986 Fleer PSA 9",
+    price: 15200,
+    img: "https://picsum.photos/300/200?random=1"
+  },
+  {
+    name: "LeBron James Rookie PSA 10",
+    price: 2500,
+    img: "https://picsum.photos/300/200?random=2"
+  },
+  {
+    name: "Tom Brady Rookie PSA 10",
+    price: 4200,
+    img: "https://picsum.photos/300/200?random=3"
+  },
+  {
+    name: "Kobe Bryant Topps Rookie PSA 10",
+    price: 3300,
+    img: "https://picsum.photos/300/200?random=4"
+  },
+  {
+    name: "Shohei Ohtani Rookie Auto",
+    price: 1800,
+    img: "https://picsum.photos/300/200?random=5"
+  },
+  {
+    name: "Patrick Mahomes Rookie Patch Auto",
+    price: 5500,
+    img: "https://picsum.photos/300/200?random=6"
+  }
+];
+
 const input = document.getElementById("searchInput");
 const resultsEl = document.getElementById("results");
-const loader = document.getElementById("loader");
+const summaryEl = document.getElementById("summary");
 
-// smaller, reliable proxy
-const PROXY = "https://api.allorigins.win/raw?url=";
+// INITIAL LOAD
+render(data);
 
-input.addEventListener("keypress", async (e) => {
-  if (e.key === "Enter") {
-    searchCards(input.value);
-  }
+input.addEventListener("input", () => {
+  const query = input.value.toLowerCase();
+
+  const filtered = data.filter(card =>
+    card.name.toLowerCase().includes(query)
+  );
+
+  render(filtered);
 });
 
-async function searchCards(query) {
+function render(cards) {
   resultsEl.innerHTML = "";
-  loader.innerText = "Scanning the marketplace...";
+  summaryEl.innerHTML = "";
 
-  const rssUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&LH_Sold=1&LH_Complete=1&_rss=1`;
+  if (cards.length === 0) {
+    resultsEl.innerHTML = "<p style='text-align:center;'>No slabs found...</p>";
+    return;
+  }
 
-  try {
-    const res = await fetch(PROXY + encodeURIComponent(rssUrl));
-    const xmlText = await res.text();
+  // 📊 summary
+  const prices = cards.map(c => c.price).sort((a,b)=>a-b);
+  const avg = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(0);
+  const median = prices.length % 2
+    ? prices[Math.floor(prices.length/2)]
+    : ((prices[prices.length/2-1]+prices[prices.length/2])/2).toFixed(0);
 
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, "text/xml");
+  summaryEl.innerHTML = `
+    <div class="summary">
+      <div>
+        <div>AVG</div>
+        <div>$${avg}</div>
+      </div>
+      <div>
+        <div>MEDIAN</div>
+        <div>$${median}</div>
+      </div>
+      <div>
+        <div>SALES</div>
+        <div>${cards.length}</div>
+      </div>
+    </div>
+  `;
 
-    const items = xml.querySelectorAll("item");
+  // 🃏 cards
+  cards.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "card";
 
-    let prices = [];
-
-    items.forEach(item => {
-      const title = item.querySelector("title")?.textContent;
-      const description = item.querySelector("description")?.textContent;
-
-      if (!title || !description) return;
-
-      // extract price
-      const priceMatch = description.match(/\$\d+(\.\d+)?/);
-      if (!priceMatch) return;
-
-      const price = parseFloat(priceMatch[0].replace("$", ""));
-      prices.push(price);
-
-      const div = document.createElement("div");
-      div.className = "card";
-
-      div.innerHTML = `
-        <div>${title}</div>
-        <div class="price">${priceMatch[0]}</div>
-      `;
-
-      resultsEl.appendChild(div);
-    });
-
-    loader.innerText = "";
-
-    if (prices.length === 0) {
-      loader.innerText = "No slabs found...";
-      return;
-    }
-
-    // analytics
-    prices.sort((a,b)=>a-b);
-    const avg = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(2);
-    const median = prices.length % 2
-      ? prices[Math.floor(prices.length/2)]
-      : ((prices[prices.length/2-1]+prices[prices.length/2])/2).toFixed(2);
-
-    const summary = document.createElement("div");
-    summary.className = "card";
-    summary.style.border = "2px solid #22c55e";
-    summary.innerHTML = `
-      <div><strong>Market Summary</strong></div>
-      <div>Avg: <span class="price">$${avg}</span></div>
-      <div>Median: <span class="price">$${median}</span></div>
-      <div>Sales: ${prices.length}</div>
+    div.innerHTML = `
+      <img src="${card.img}" />
+      <div class="card-body">
+        <div class="title">${card.name}</div>
+        <div class="price">$${card.price.toLocaleString()}</div>
+      </div>
     `;
 
-    resultsEl.prepend(summary);
-
-  } catch (err) {
-    loader.innerText = "Data stream failed ⚠️";
-    console.error(err);
-  }
+    resultsEl.appendChild(div);
+  });
 }
 </script>
 
