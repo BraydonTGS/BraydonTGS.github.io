@@ -6,69 +6,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    :root {
-        --bg: #f4f1ea;
-        --card: #ffffff;
-        --primary: #7a8f7b;
-        --secondary: #a3b18a;
-        --text: #3a3a3a;
-        --muted: #7d7d7d;
-    }
+:root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --primary: #7a8f7b;
+    --secondary: #a3b18a;
+    --text: #3a3a3a;
+    --muted: #7d7d7d;
+}
 
-    body.dark {
-        --bg: #1f2a24;
-        --card: #2c3a33;
-        --primary: #a3b18a;
-        --secondary: #7a8f7b;
-        --text: #f1f1f1;
-        --muted: #cfcfcf;
-    }
+body.dark {
+    --bg: #1f2a24;
+    --card: #2c3a33;
+    --primary: #a3b18a;
+    --secondary: #7a8f7b;
+    --text: #f1f1f1;
+    --muted: #cfcfcf;
+}
 
-    body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-    }
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
 
-    .container {
-        width: 90%;
-        max-width: 420px;
-        text-align: center;
-        position: relative;
-    }
+.container {
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    position: relative;
+}
 
-    h1 { margin-bottom: 10px; }
-    p { color: var(--muted); }
+h1 { margin-bottom: 10px; }
+p { color: var(--muted); }
 
-    .card {
-        background: var(--card);
-        border-radius: 20px;
-        padding: 23px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    }
+.card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 23px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
 
-    button {
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 14px;
-        width: 100%;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
 
-    button:hover { background: var(--secondary); }
-    button:active {
-        transform: scale(0.97);
-    }
-    
+button:hover { background: var(--secondary); }
+button:active { transform: scale(0.97); }
+
 .icon-btn {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 10px);
@@ -82,63 +80,109 @@
     font-size: 18px;
     padding: 0;
     z-index: 1000;
-
     opacity: 0.85;
     backdrop-filter: blur(6px);
 }
 
-.icon-btn:hover {
-    opacity: 1;
+.icon-btn:hover { opacity: 1; }
+
+.results {
+    margin-top: 20px;
+    text-align: left;
 }
-    .results {
-        margin-top: 20px;
-        text-align: left;
-    }
 
-    .result-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-        opacity: 0;
-        transform: translateY(10px);
-        animation: fadeIn 0.4s ease forwards;
-    }
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.4s ease forwards;
+}
 
-    .result-item:nth-child(1) { animation-delay: 0.05s; }
-    .result-item:nth-child(2) { animation-delay: 0.1s; }
-    .result-item:nth-child(3) { animation-delay: 0.15s; }
-    .result-item:nth-child(4) { animation-delay: 0.2s; }
-    .result-item:nth-child(5) { animation-delay: 0.25s; }
-    .result-item:nth-child(6) { animation-delay: 0.3s; }
-    .result-item:nth-child(7) { animation-delay: 0.35s; }
-    .result-item:nth-child(8) { animation-delay: 0.4s; }
-    .result-item:nth-child(9) { animation-delay: 0.45s; }
+.result-item:nth-child(1) { animation-delay: 0.05s; }
+.result-item:nth-child(2) { animation-delay: 0.1s; }
+.result-item:nth-child(3) { animation-delay: 0.15s; }
+.result-item:nth-child(4) { animation-delay: 0.2s; }
+.result-item:nth-child(5) { animation-delay: 0.25s; }
+.result-item:nth-child(6) { animation-delay: 0.3s; }
+.result-item:nth-child(7) { animation-delay: 0.35s; }
+.result-item:nth-child(8) { animation-delay: 0.4s; }
+.result-item:nth-child(9) { animation-delay: 0.45s; }
 
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+@keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    .small { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.small { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+/* Modal styles */
+.modal-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.modal-bg.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+    width: 250px;
+    text-align: center;
+    transform: translateY(-10px);
+    transition: transform 0.25s ease;
+}
+
+.modal-bg.active .modal {
+    transform: translateY(0);
+}
+
+.modal input {
+    width: 50px;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
 </style>
 </head>
 <body>
-    
+
 <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
-    
+
 <div class="container">
     <h1>🌿 Next Feed</h1>
     <p>Tap once. Stay simple.</p>
 
     <div class="card">
         <button onclick="logFeeding()">Log Feeding</button>
+        <button onclick="showCustomTimePicker()">Select Time</button>
 
         <div class="small" id="lastFed"></div>
-
         <div class="results" id="results"></div>
+    </div>
+</div>
+
+<!-- Time Picker Modal -->
+<div class="modal-bg" id="timeModal">
+    <div class="modal">
+        <h3>Select Time</h3>
+        <input type="number" id="hourInput" min="0" max="23" value="12"> :
+        <input type="number" id="minuteInput" min="0" max="59" value="0">
+        <button onclick="confirmTime()">Set Time</button>
     </div>
 </div>
 
@@ -147,26 +191,29 @@ function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+// Normal logging
 function logFeeding() {
-    const now = new Date();
+    logFeedingAt(new Date());
+}
 
-    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
-    localStorage.setItem("lastFed", now);
+// Core logging function
+function logFeedingAt(date) {
+    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
+    localStorage.setItem("lastFed", date);
 
     const resultsDiv = document.getElementById("results");
-
     const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
 
     let html = "";
-
     intervals.forEach(hour => {
-        const next = new Date(now.getTime() + hour * 3600000);
+        const next = new Date(date.getTime() + hour * 3600000);
         html += `<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
     });
 
     resultsDiv.innerHTML = html;
 }
 
+// Dark mode functions
 function updateThemeIcon() {
     const isDark = document.body.classList.contains("dark");
     document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
@@ -174,22 +221,41 @@ function updateThemeIcon() {
 
 function toggleDarkMode() {
     document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("darkMode", isDark);
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
     updateThemeIcon();
 }
 
+// Custom time picker
+function showCustomTimePicker() {
+    document.getElementById("timeModal").classList.add("active");
+}
+
+function confirmTime() {
+    const h = parseInt(document.getElementById("hourInput").value);
+    const m = parseInt(document.getElementById("minuteInput").value);
+    const date = new Date();
+    date.setHours(h, m, 0, 0);
+    logFeedingAt(date);
+    document.getElementById("timeModal").classList.remove("active");
+}
+
+// Init app
 function init() {
+    // Theme: system preference or saved
+    const savedTheme = localStorage.getItem("darkMode");
+    if (savedTheme !== null) {
+        document.body.classList.toggle("dark", savedTheme === "true");
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.classList.toggle("dark", prefersDark);
+    }
+    updateThemeIcon();
+
+    // Last fed
     const lastFed = localStorage.getItem("lastFed");
     if (lastFed) {
         document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(new Date(lastFed));
     }
-
-    if (localStorage.getItem("darkMode") === "true") {
-        document.body.classList.add("dark");
-    }
-
-    updateThemeIcon();
 }
 
 init();
