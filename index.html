@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Next Feed</title>
+<title>Baby Feeding Scheduler</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -49,6 +49,7 @@
         border-radius: 20px;
         padding: 20px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        position: relative;
     }
 
     button {
@@ -66,14 +67,17 @@
     button:hover { background: var(--secondary); }
 
     .icon-btn {
-        width: 44px;
-        height: 44px;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        margin: 0 auto 10px auto;
+        font-size: 16px;
+        padding: 0;
     }
 
     .results {
@@ -114,11 +118,11 @@
 <body>
 
 <div class="container">
-    <h1>🌿 Next Feed</h1>
+    <h1>🌿 Feeding Tracker</h1>
     <p>Tap once. Stay simple.</p>
 
     <div class="card">
-        <button class="icon-btn" onclick="toggleDarkMode()">🌙</button>
+        <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
 
         <button onclick="logFeeding()">Log Feeding</button>
 
@@ -153,9 +157,16 @@ function logFeeding() {
     resultsDiv.innerHTML = html;
 }
 
+function updateThemeIcon() {
+    const isDark = document.body.classList.contains("dark");
+    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+}
+
 function toggleDarkMode() {
     document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("darkMode", isDark);
+    updateThemeIcon();
 }
 
 function init() {
@@ -167,6 +178,8 @@ function init() {
     if (localStorage.getItem("darkMode") === "true") {
         document.body.classList.add("dark");
     }
+
+    updateThemeIcon();
 }
 
 init();
