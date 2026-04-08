@@ -66,7 +66,7 @@ button:active { transform: scale(0.97); }
 
 /* Wheel picker */
 .picker-container { display: flex; justify-content: center; align-items: center; gap: 10px; height: 140px; overflow: hidden; position: relative; margin: 10px 0; }
-.picker { flex: 1; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; border-radius: 12px; background: var(--card); padding: 10px 0; text-align: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); position: relative; }
+.picker { flex: 1; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; border-radius: 12px; background: var(--card); padding: 10px 0; text-align: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); position: relative; scroll-behavior: smooth; }
 .picker div { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 18px; color: var(--text); transition: all 0.2s; }
 .picker div.selected { font-size: 22px; font-weight: bold; color: var(--primary); }
 /* Center highlight overlay */
@@ -103,11 +103,12 @@ button:active { transform: scale(0.97); }
 </div>
 
 <script>
+// Format time using user's system preference
 function formatTime(date){
-    // Uses user's system preference (12h or 24h)
     return date.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit', hour12: undefined });
 }
 
+// Log feeding
 function logFeeding(){ logFeedingAt(new Date()); }
 function logFeedingAt(date){
     document.getElementById("lastFed").innerText = "Last fed at: "+formatTime(date);
@@ -135,56 +136,67 @@ function toggleDarkMode(){
 }
 
 // Wheel picker
-function populatePicker(id,range){
-    const picker=document.getElementById(id);
-    picker.innerHTML="";
+function populatePicker(id, range, selectedValue = 0){
+    const picker = document.getElementById(id);
+    picker.innerHTML = "";
     range.forEach(val=>{
-        const div=document.createElement("div");
-        div.innerText=val.toString().padStart(2,"0");
+        const div = document.createElement("div");
+        div.innerText = val.toString().padStart(2,"0");
         picker.appendChild(div);
     });
-    centerSelected(picker);
-    picker.addEventListener("scroll",()=>centerSelected(picker));
+    setTimeout(()=>{
+        picker.scrollTop = selectedValue * 40; // center selected
+        centerSelected(picker);
+    }, 50);
+    picker.addEventListener("scroll", ()=>centerSelected(picker));
 }
+
 function centerSelected(picker){
-    const children=Array.from(picker.children);
-    const height=children[0].offsetHeight;
-    const scrollTop=picker.scrollTop;
-    const index=Math.round(scrollTop/height);
-    children.forEach((c,i)=>c.classList.toggle("selected",i===index));
-    picker.scrollTop=index*height;
+    const children = Array.from(picker.children);
+    const height = children[0].offsetHeight;
+    const index = Math.round(picker.scrollTop / height);
+    children.forEach((c,i)=>c.classList.toggle("selected", i===index));
+    picker.scrollTop = index*height;
 }
+
 function getSelectedValue(picker){
     return parseInt(picker.querySelector(".selected").innerText);
 }
 
 function showCustomTimePicker(){
-    populatePicker("hourPicker",Array.from({length:24},(_,i)=>i));
-    populatePicker("minutePicker",Array.from({length:60},(_,i)=>i));
+    let lastFed = localStorage.getItem("lastFed");
+    let date = lastFed ? new Date(lastFed) : new Date();
+    let hour = date.getHours();
+    let minute = date.getMinutes();
+
+    populatePicker("hourPicker", Array.from({length:24},(_,i)=>i), hour);
+    populatePicker("minutePicker", Array.from({length:60},(_,i)=>i), minute);
     document.getElementById("timeModal").classList.add("active");
 }
+
 function confirmTime(){
-    const h=getSelectedValue(document.getElementById("hourPicker"));
-    const m=getSelectedValue(document.getElementById("minutePicker"));
-    const date=new Date();
-    date.setHours(h,m,0,0);
+    const h = getSelectedValue(document.getElementById("hourPicker"));
+    const m = getSelectedValue(document.getElementById("minutePicker"));
+    const date = new Date();
+    date.setHours(h, m, 0, 0);
     logFeedingAt(date);
     document.getElementById("timeModal").classList.remove("active");
 }
 
+// Init
 function init(){
     const savedTheme = localStorage.getItem("darkMode");
-    if(savedTheme!==null){
-        document.body.classList.toggle("dark",savedTheme==="true");
-    }else{
-        const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.body.classList.toggle("dark",prefersDark);
+    if(savedTheme !== null){
+        document.body.classList.toggle("dark", savedTheme === "true");
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.classList.toggle("dark", prefersDark);
     }
     updateThemeIcon();
 
-    const lastFed=localStorage.getItem("lastFed");
+    const lastFed = localStorage.getItem("lastFed");
     if(lastFed){
-        document.getElementById("lastFed").innerText="Last fed at: "+formatTime(new Date(lastFed));
+        document.getElementById("lastFed").innerText = "Last fed at: "+formatTime(new Date(lastFed));
     }
 }
 
