@@ -35,72 +35,17 @@ body {
     min-height: 100vh;
 }
 
-.container {
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    position: relative;
-}
-
+.container { width: 90%; max-width: 420px; text-align: center; position: relative; }
 h1 { margin-bottom: 10px; }
 p { color: var(--muted); }
-
-.card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 23px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    width: 100%;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
+.card { background: var(--card); border-radius: 20px; padding: 23px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+button { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 10px; }
 button:hover { background: var(--secondary); }
 button:active { transform: scale(0.97); }
-
-.icon-btn {
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 10px);
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    padding: 0;
-    z-index: 1000;
-    opacity: 0.85;
-    backdrop-filter: blur(6px);
-}
-
+.icon-btn { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 16px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; padding: 0; z-index: 1000; opacity: 0.85; backdrop-filter: blur(6px); }
 .icon-btn:hover { opacity: 1; }
-
-.results {
-    margin-top: 20px;
-    text-align: left;
-}
-
-.result-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    opacity: 0;
-    transform: translateY(10px);
-    animation: fadeIn 0.4s ease forwards;
-}
-
+.results { margin-top: 20px; text-align: left; }
+.result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; opacity: 0; transform: translateY(10px); animation: fadeIn 0.4s ease forwards; }
 .result-item:nth-child(1) { animation-delay: 0.05s; }
 .result-item:nth-child(2) { animation-delay: 0.1s; }
 .result-item:nth-child(3) { animation-delay: 0.15s; }
@@ -110,100 +55,22 @@ button:active { transform: scale(0.97); }
 .result-item:nth-child(7) { animation-delay: 0.35s; }
 .result-item:nth-child(8) { animation-delay: 0.4s; }
 .result-item:nth-child(9) { animation-delay: 0.45s; }
-
-@keyframes fadeIn {
-    to { opacity: 1; transform: translateY(0); }
-}
-
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 .small { font-size: 13px; color: var(--muted); margin-top: 10px; }
 
 /* Modal styles */
-.modal-bg {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 999;
-}
-
-.modal-bg.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.modal {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 20px;
-    width: 260px;
-    text-align: center;
-    transform: translateY(-10px);
-    transition: transform 0.25s ease;
-}
-
-.modal-bg.active .modal {
-    transform: translateY(0);
-}
+.modal-bg { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 999; }
+.modal-bg.active { opacity: 1; pointer-events: auto; }
+.modal { background: var(--card); border-radius: 20px; padding: 20px; width: 260px; text-align: center; transform: translateY(-10px); transition: transform 0.25s ease; }
+.modal-bg.active .modal { transform: translateY(0); }
 
 /* Wheel picker */
-.picker-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    height: 140px;
-    overflow: hidden;
-    position: relative;
-    margin: 10px 0;
-}
-
-.picker {
-    flex: 1;
-    height: 100%;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 12px;
-    background: var(--card);
-    padding: 10px 0;
-    text-align: center;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-    position: relative;
-}
-
-.picker div {
-    height: 40px;
-    line-height: 40px;
-    scroll-snap-align: center;
-    font-size: 18px;
-    color: var(--text);
-    transition: all 0.2s;
-}
-
-.picker div.selected {
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--primary);
-}
-
+.picker-container { display: flex; justify-content: center; align-items: center; gap: 10px; height: 140px; overflow: hidden; position: relative; margin: 10px 0; }
+.picker { flex: 1; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; border-radius: 12px; background: var(--card); padding: 10px 0; text-align: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); position: relative; }
+.picker div { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 18px; color: var(--text); transition: all 0.2s; }
+.picker div.selected { font-size: 22px; font-weight: bold; color: var(--primary); }
 /* Center highlight overlay */
-.picker-container::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    background: rgba(0,0,0,0.05);
-    border-radius: 12px;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
+.picker-container::after { content:""; position:absolute; top:50%; left:0; width:100%; height:40px; background: rgba(0,0,0,0.05); border-radius:12px; transform: translateY(-50%); pointer-events:none; }
 </style>
 </head>
 <body>
@@ -236,103 +103,88 @@ button:active { transform: scale(0.97); }
 </div>
 
 <script>
-function formatTime(date) {
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+function formatTime(date){
+    // Uses user's system preference (12h or 24h)
+    return date.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit', hour12: undefined });
 }
 
-// Normal logging
-function logFeeding() {
-    logFeedingAt(new Date());
-}
-
-// Core logging function
-function logFeedingAt(date) {
-    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
+function logFeeding(){ logFeedingAt(new Date()); }
+function logFeedingAt(date){
+    document.getElementById("lastFed").innerText = "Last fed at: "+formatTime(date);
     localStorage.setItem("lastFed", date);
 
     const resultsDiv = document.getElementById("results");
     const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
-
-    let html = "";
-    intervals.forEach(hour => {
-        const next = new Date(date.getTime() + hour * 3600000);
-        html += `<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
+    let html="";
+    intervals.forEach(hour=>{
+        const next = new Date(date.getTime()+hour*3600000);
+        html+=`<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
     });
-
     resultsDiv.innerHTML = html;
 }
 
-// Dark mode functions
-function updateThemeIcon() {
+// Dark mode
+function updateThemeIcon(){
     const isDark = document.body.classList.contains("dark");
-    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+    document.getElementById("themeBtn").innerText = isDark ? "☀️":"🌙";
 }
-
-function toggleDarkMode() {
+function toggleDarkMode(){
     document.body.classList.toggle("dark");
     localStorage.setItem("darkMode", document.body.classList.contains("dark"));
     updateThemeIcon();
 }
 
-// Wheel Picker
-function populatePicker(id, range) {
-    const picker = document.getElementById(id);
-    picker.innerHTML = "";
-    range.forEach(val => {
-        const div = document.createElement("div");
-        div.innerText = val.toString().padStart(2,"0");
+// Wheel picker
+function populatePicker(id,range){
+    const picker=document.getElementById(id);
+    picker.innerHTML="";
+    range.forEach(val=>{
+        const div=document.createElement("div");
+        div.innerText=val.toString().padStart(2,"0");
         picker.appendChild(div);
     });
     centerSelected(picker);
-    picker.addEventListener("scroll", () => centerSelected(picker));
+    picker.addEventListener("scroll",()=>centerSelected(picker));
+}
+function centerSelected(picker){
+    const children=Array.from(picker.children);
+    const height=children[0].offsetHeight;
+    const scrollTop=picker.scrollTop;
+    const index=Math.round(scrollTop/height);
+    children.forEach((c,i)=>c.classList.toggle("selected",i===index));
+    picker.scrollTop=index*height;
+}
+function getSelectedValue(picker){
+    return parseInt(picker.querySelector(".selected").innerText);
 }
 
-// Center highlight
-function centerSelected(picker) {
-    const children = Array.from(picker.children);
-    const height = children[0].offsetHeight;
-    const scrollTop = picker.scrollTop;
-    const index = Math.round(scrollTop / height);
-
-    children.forEach((c,i)=> c.classList.toggle("selected", i===index));
-    // Snap to center
-    picker.scrollTop = index * height;
-}
-
-function getSelectedValue(picker) {
-    const selected = picker.querySelector(".selected");
-    return parseInt(selected.innerText);
-}
-
-function showCustomTimePicker() {
-    populatePicker("hourPicker", Array.from({length:24},(_,i)=>i));
-    populatePicker("minutePicker", Array.from({length:60},(_,i)=>i));
+function showCustomTimePicker(){
+    populatePicker("hourPicker",Array.from({length:24},(_,i)=>i));
+    populatePicker("minutePicker",Array.from({length:60},(_,i)=>i));
     document.getElementById("timeModal").classList.add("active");
 }
-
-function confirmTime() {
-    const h = getSelectedValue(document.getElementById("hourPicker"));
-    const m = getSelectedValue(document.getElementById("minutePicker"));
-    const date = new Date();
+function confirmTime(){
+    const h=getSelectedValue(document.getElementById("hourPicker"));
+    const m=getSelectedValue(document.getElementById("minutePicker"));
+    const date=new Date();
     date.setHours(h,m,0,0);
     logFeedingAt(date);
     document.getElementById("timeModal").classList.remove("active");
 }
 
-// Init app
-function init() {
+function init(){
     const savedTheme = localStorage.getItem("darkMode");
     if(savedTheme!==null){
         document.body.classList.toggle("dark",savedTheme==="true");
-    } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }else{
+        const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.body.classList.toggle("dark",prefersDark);
     }
     updateThemeIcon();
 
-    const lastFed = localStorage.getItem("lastFed");
+    const lastFed=localStorage.getItem("lastFed");
     if(lastFed){
-        document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(new Date(lastFed));
+        document.getElementById("lastFed").innerText="Last fed at: "+formatTime(new Date(lastFed));
     }
 }
 
