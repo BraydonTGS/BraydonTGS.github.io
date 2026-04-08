@@ -29,70 +29,67 @@ body {
     font-family: -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
 }
 
+/* ✅ TRUE FIXED HEADER */
 .top-actions {
     position: fixed;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     display: flex;
-    gap: 8px;
+    gap: 6px;
     z-index: 9999;
 }
 
 .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
     background: var(--card);
     color: var(--text);
+    font-size: 16px;
 }
 
+/* layout fix */
 .container {
-    width: 90%;
     max-width: 420px;
+    margin: 70px auto 20px; /* space for header */
+    padding: 0 12px;
     text-align: center;
 }
 
 .card {
     background: var(--card);
-    border-radius: 20px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 16px;
 }
 
 button.main {
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 10px;
+    padding: 12px;
     width: 100%;
-    font-size: 16px;
+    font-size: 15px;
 }
 
+/* tighter list */
 .results {
-    margin-top: 20px;
+    margin-top: 12px;
     text-align: left;
 }
 
 .result-item {
     display: flex;
     justify-content: space-between;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 14px;
     cursor: pointer;
-    border: 1px solid transparent;
-}
-
-.result-item:hover {
-    border-color: var(--secondary);
 }
 
 .result-item.selected {
@@ -101,20 +98,19 @@ button.main {
 }
 
 .small {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 10px;
-}
-
-.countdown {
-    margin-top: 8px;
-    font-size: 14px;
-}
-
-.hint {
     font-size: 12px;
     color: var(--muted);
     margin-top: 6px;
+}
+
+.countdown {
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.status {
+    font-size: 12px;
+    margin-top: 4px;
 }
 </style>
 </head>
@@ -126,15 +122,14 @@ button.main {
 </div>
 
 <div class="container">
-    <h1>🌿 Next Feed</h1>
-    <p>Tap once. Stay simple.</p>
+    <h2>🌿 Next Feed</h2>
 
     <div class="card">
         <button class="main" onclick="logFeeding()">Log Feeding</button>
 
         <div class="small" id="lastFed"></div>
         <div class="countdown" id="countdown"></div>
-        <div class="hint">Tap a row to set default</div>
+        <div class="status" id="notifStatus"></div>
 
         <div class="results" id="results"></div>
     </div>
@@ -157,7 +152,7 @@ function logFeeding() {
     localStorage.setItem("lastFed", now);
 
     document.getElementById("lastFed").innerText =
-        "Last fed at: " + formatTime(now);
+        "Last fed: " + formatTime(now);
 
     renderResults(now);
     scheduleNotification(now);
@@ -178,7 +173,7 @@ function renderResults(baseTime) {
         if (hour === defaultInterval) div.classList.add("selected");
 
         div.innerHTML = `
-            <span>${hour} hr</span>
+            <span>${hour}h</span>
             <span>${formatTime(next)}</span>
         `;
 
@@ -186,11 +181,6 @@ function renderResults(baseTime) {
 
         resultsDiv.appendChild(div);
     });
-
-    const selected = document.querySelector(".selected");
-    if (selected) {
-        selected.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
 }
 
 function setDefault(hour) {
@@ -227,14 +217,28 @@ function startCountdown() {
     }, 60000);
 }
 
+function updateNotifStatus() {
+    const status = document.getElementById("notifStatus");
+
+    if (Notification.permission === "granted") {
+        status.innerText = "🔔 Notifications on";
+    } else if (Notification.permission === "denied") {
+        status.innerText = "🔕 Notifications blocked";
+    } else {
+        status.innerText = "🔕 Notifications off";
+    }
+}
+
 function scheduleNotification(baseTime) {
     const interval = parseFloat(localStorage.getItem("defaultInterval"));
     if (!interval) return;
 
     if (Notification.permission !== "granted") {
-        Notification.requestPermission();
+        Notification.requestPermission().then(updateNotifStatus);
         return;
     }
+
+    updateNotifStatus();
 
     const delay = interval * 3600000;
 
@@ -244,8 +248,7 @@ function scheduleNotification(baseTime) {
 }
 
 function clearAll() {
-    localStorage.removeItem("lastFed");
-    localStorage.removeItem("defaultInterval");
+    localStorage.removeItem("lastFed"); // ✅ keep default
 
     document.getElementById("lastFed").innerText = "";
     document.getElementById("results").innerHTML = "";
@@ -267,7 +270,7 @@ function init() {
     if (lastFed) {
         const date = new Date(lastFed);
         document.getElementById("lastFed").innerText =
-            "Last fed at: " + formatTime(date);
+            "Last fed: " + formatTime(date);
 
         renderResults(date);
         startCountdown();
@@ -279,6 +282,8 @@ function init() {
 
     document.getElementById("themeBtn").innerText =
         document.body.classList.contains("dark") ? "☀️" : "🌙";
+
+    updateNotifStatus();
 }
 
 init();
