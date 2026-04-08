@@ -6,325 +6,310 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root {
-    --bg: #f4f1ea;
-    --card: #ffffff;
-    --primary: #7a8f7b;
-    --secondary: #a3b18a;
-    --text: #3a3a3a;
-    --muted: #7d7d7d;
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --primary: #7a8f7b;
+  --secondary: #a3b18a;
+  --text: #3a3a3a;
+  --muted: #7d7d7d;
 }
 body.dark {
-    --bg: #1f2a24;
-    --card: #2c3a33;
-    --primary: #a3b18a;
-    --secondary: #7a8f7b;
-    --text: #f1f1f1;
-    --muted: #cfcfcf;
+  --bg: #1f2a24;
+  --card: #2c3a33;
+  --primary: #a3b18a;
+  --secondary: #7a8f7b;
+  --text: #f1f1f1;
+  --muted: #cfcfcf;
 }
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  position:relative;
 }
 .container {
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    position: relative;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+  position:relative;
 }
-h1 { margin-bottom: 10px; }
-p { color: var(--muted); }
+h1 {margin-bottom:10px;}
+p {color:var(--muted);}
 .card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 23px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    position: relative;
+  background:var(--card);
+  border-radius:20px;
+  padding:23px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.05);
+  position:relative;
 }
 button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    width: 100%;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
+  background:var(--primary);
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:14px;
+  width:100%;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
 }
-button:hover { background: var(--secondary); }
-button:active { transform: scale(0.97); }
+button:hover {background:var(--secondary);}
+button:active {transform:scale(0.97);}
 .results {
-    margin-top: 20px;
-    text-align: left;
+  margin-top:20px;
+  text-align:left;
 }
 .result-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    opacity: 0;
-    transform: translateY(10px);
-    animation: fadeIn 0.4s ease forwards;
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid #eee;
+  opacity:0;
+  transform:translateY(10px);
+  animation:fadeIn 0.4s ease forwards;
 }
-.result-item:nth-child(1) { animation-delay: 0.05s; }
-.result-item:nth-child(2) { animation-delay: 0.1s; }
-.result-item:nth-child(3) { animation-delay: 0.15s; }
-.result-item:nth-child(4) { animation-delay: 0.2s; }
-.result-item:nth-child(5) { animation-delay: 0.25s; }
-.result-item:nth-child(6) { animation-delay: 0.3s; }
-.result-item:nth-child(7) { animation-delay: 0.35s; }
-.result-item:nth-child(8) { animation-delay: 0.4s; }
-.result-item:nth-child(9) { animation-delay: 0.45s; }
-@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-.small { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.result-item:nth-child(1){animation-delay:0.05s;}
+.result-item:nth-child(2){animation-delay:0.1s;}
+.result-item:nth-child(3){animation-delay:0.15s;}
+.result-item:nth-child(4){animation-delay:0.2s;}
+.result-item:nth-child(5){animation-delay:0.25s;}
+.result-item:nth-child(6){animation-delay:0.3s;}
+.result-item:nth-child(7){animation-delay:0.35s;}
+.result-item:nth-child(8){animation-delay:0.4s;}
+.result-item:nth-child(9){animation-delay:0.45s;}
+@keyframes fadeIn{to{opacity:1;transform:translateY(0);}}
+.small{font-size:13px;color:var(--muted);margin-top:10px;}
 
 /* Modal */
 .modal-bg {
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 999;
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.4);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.25s ease;z-index:999;
 }
-.modal-bg.active { opacity: 1; pointer-events: auto; }
-.modal {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 20px;
-    width: 260px;
-    text-align: center;
-    transform: translateY(-10px);
-    transition: transform 0.25s ease;
+.modal-bg.active{opacity:1;pointer-events:auto;}
+.modal{
+  background:var(--card);
+  border-radius:20px;
+  padding:20px;
+  width:260px;
+  text-align:center;
+  transform:translateY(-10px);
+  transition:transform 0.25s ease;
 }
-.modal-bg.active .modal { transform: translateY(0); }
+.modal-bg.active .modal{transform:translateY(0);}
 
 /* Wheel picker */
-.picker-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    height: 140px;
-    overflow: hidden;
-    position: relative;
-    margin: 10px 0;
-    border-radius: 12px;
-    background: var(--card);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+.picker-container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  height:140px;
+  overflow:hidden;
+  position:relative;
+  margin:10px 0;
+  border-radius:12px;
+  background:var(--card);
+  box-shadow:inset 0 0 10px rgba(0,0,0,0.05);
 }
-.picker {
-    flex: 1;
-    height: 100%;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-    text-align: center;
-    padding: 60px 0;
-    scroll-behavior: smooth;
-    pointer-events: auto;
+.picker{
+  flex:1;
+  height:100%;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+  text-align:center;
+  padding:60px 0;
+  scroll-behavior:smooth;
 }
-.picker div {
-    height: 40px;
-    line-height: 40px;
-    scroll-snap-align: center;
-    font-size: 18px;
-    color: var(--muted);
-    transition: all 0.2s;
+.picker div{
+  height:40px;
+  line-height:40px;
+  scroll-snap-align:center;
+  font-size:18px;
+  color:var(--muted);
+  transition: all 0.2s;
 }
-.picker div.center {
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--primary);
-    opacity: 1;
-    transform: scale(1.3);
+.picker div.center{
+  font-size:22px;
+  font-weight:bold;
+  color:var(--primary);
+  opacity:1;
+  transform:scale(1.3);
 }
-.picker-container::after {
-    content:"";
-    position:absolute;
-    top:50%;
-    left:0;
-    width:100%;
-    height:40px;
-    border: 2px solid var(--primary);
-    border-radius:12px;
-    transform: translateY(-50%);
-    pointer-events:none;
+.picker-container::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:0;
+  width:100%;
+  height:40px;
+  border:2px solid var(--primary);
+  border-radius:12px;
+  transform:translateY(-50%);
+  pointer-events:none;
 }
 
-/* Theme & Clear buttons inside card */
-.theme-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    padding: 0;
-    opacity: 0.85;
-    backdrop-filter: blur(6px);
+/* Floating buttons outside card */
+.theme-btn{
+  position:fixed;
+  top:calc(env(safe-area-inset-top,20px)+10px);
+  right:16px;
+  width:40px;height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  padding:0;
+  opacity:0.85;
+  backdrop-filter:blur(6px);
+  z-index:1000;
 }
-.theme-btn:hover { opacity: 1; }
-.clear-btn {
-    position: absolute;
-    top: 16px;
-    right: 64px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    padding: 0;
-    background: var(--primary);
-    color: white;
-    border: none;
-    cursor: pointer;
-    opacity: 0.85;
+.theme-btn:hover{opacity:1;}
+.clear-btn{
+  position:fixed;
+  top:calc(env(safe-area-inset-top,20px)+10px);
+  left:16px;
+  width:40px;height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  padding:0;
+  background:var(--primary);
+  color:white;
+  border:none;
+  cursor:pointer;
+  opacity:0.85;
+  z-index:1000;
 }
-.clear-btn:hover { opacity: 1; }
+.clear-btn:hover{opacity:1;}
 </style>
 </head>
 <body>
-    
+
 <button class="theme-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
 <button class="clear-btn" onclick="clearResults()">⟳</button>
-    
+
 <div class="container">
-    <h1>🌿 Next Feed</h1>
-    <p>Tap once. Stay simple.</p>
-    <div class="card">
-        <button onclick="logFeeding()">Log Feeding</button>
-        <button onclick="showCustomTimePicker()">Select Time</button>
-        <div class="small" id="lastFed"></div>
-        <div class="results" id="results"></div>
-    </div>
+  <h1>🌿 Next Feed</h1>
+  <p>Tap once. Stay simple.</p>
+  <div class="card">
+    <button onclick="logFeeding()">Log Feeding</button>
+    <button onclick="showCustomTimePicker()">Select Time</button>
+    <div class="small" id="lastFed"></div>
+    <div class="results" id="results"></div>
+  </div>
 </div>
 
 <div class="modal-bg" id="timeModal">
-    <div class="modal">
-        <h3>Select Time</h3>
-        <div class="picker-container">
-            <div class="picker" id="hourPicker"></div>
-            <div class="picker" id="minutePicker"></div>
-        </div>
-        <button onclick="confirmTime()">Set Time</button>
+  <div class="modal">
+    <h3>Select Time</h3>
+    <div class="picker-container">
+      <div class="picker" id="hourPicker"></div>
+      <div class="picker" id="minutePicker"></div>
     </div>
+    <button onclick="confirmTime()">Set Time</button>
+  </div>
 </div>
 
 <script>
-function is24HourFormat() {
-    return !new Date().toLocaleTimeString().match(/AM|PM/i);
-}
-function formatTime(date) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: !is24HourFormat() });
-}
-function logFeeding() { logFeedingAt(new Date()); }
-function logFeedingAt(date) {
-    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
-    localStorage.setItem("lastFed", date);
-    const resultsDiv = document.getElementById("results");
-    const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
-    resultsDiv.innerHTML = intervals.map(h => {
-        const next = new Date(date.getTime() + h*3600000);
-        return `<div class="result-item"><span>${h} hr</span><span>${formatTime(next)}</span></div>`;
-    }).join('');
-}
-function toggleDarkMode() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
-    updateThemeIcon();
-}
-function updateThemeIcon() {
-    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
+function is24HourFormat(){ return !new Date().toLocaleTimeString().match(/AM|PM/i); }
+function formatTime(date){ return date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:!is24HourFormat()}); }
+
+function logFeeding(){ logFeedingAt(new Date()); }
+function logFeedingAt(date){
+  document.getElementById("lastFed").innerText="Last fed at: "+formatTime(date);
+  localStorage.setItem("lastFed",date);
+  const resultsDiv=document.getElementById("results");
+  const intervals=[1,1.5,2,2.5,3,3.5,4,4.5,5];
+  resultsDiv.innerHTML=intervals.map(h=>{
+    const next=new Date(date.getTime()+h*3600000);
+    return `<div class="result-item"><span>${h} hr</span><span>${formatTime(next)}</span></div>`;
+  }).join('');
 }
 
-// Picker
-function populatePicker(id, range, value) {
-    const picker = document.getElementById(id);
-    picker.innerHTML = '';
-    const pad = 2;
-    for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
-    range.forEach(v => { const d=document.createElement('div'); d.innerText=v.toString().padStart(2,'0'); picker.appendChild(d); });
-    for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
-    scrollToCenter(picker, value);
-    let scrollTimeout;
-    picker.addEventListener('scroll', () => {
-        centerHighlight(picker);
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => snapToCenter(picker), 100);
-    });
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+  updateThemeIcon();
 }
-function scrollToCenter(picker, index) {
-    const itemHeight=40, pad=2;
-    const centerOffset=picker.offsetHeight/2 - itemHeight/2;
-    picker.scrollTop = (index+pad)*itemHeight - centerOffset;
+function updateThemeIcon(){
+  document.getElementById("themeBtn").innerText=document.body.classList.contains("dark")?"☀️":"🌙";
+}
+
+// Picker functions
+function populatePicker(id,range,value){
+  const picker=document.getElementById(id);
+  picker.innerHTML='';
+  const pad=2;
+  for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
+  range.forEach(v=>{const d=document.createElement('div'); d.innerText=v.toString().padStart(2,'0'); picker.appendChild(d);});
+  for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
+  setTimeout(()=>scrollToCenter(picker,value),50);
+  let scrollTimeout;
+  picker.addEventListener('scroll',()=>{
     centerHighlight(picker);
+    clearTimeout(scrollTimeout);
+    scrollTimeout=setTimeout(()=>snapToCenter(picker),100);
+  });
+}
+function scrollToCenter(picker,index){
+  const itemHeight=40, centerOffset=picker.offsetHeight/2 - itemHeight/2;
+  picker.scrollTop=(index+2)*itemHeight - centerOffset;
+  centerHighlight(picker);
 }
 function centerHighlight(picker){
-    const children = Array.from(picker.children).filter(c=>c.innerText);
-    const centerY = picker.getBoundingClientRect().top + picker.offsetHeight/2;
-    let closest = children[0], minDiff=Infinity;
-    children.forEach(c=>{
-        const rect=c.getBoundingClientRect();
-        const diff=Math.abs(rect.top+rect.height/2 - centerY);
-        if(diff<minDiff){ minDiff=diff; closest=c; minDiff=diff; }
-    });
-    children.forEach(c=>{ c.classList.remove('center'); c.style.opacity='0.5'; c.style.transform='scale(1)'; });
-    closest.classList.add('center');
-    closest.style.opacity='1';
-    closest.style.transform='scale(1.3)';
+  const children=Array.from(picker.children).filter(c=>c.innerText);
+  const centerY=picker.getBoundingClientRect().top + picker.offsetHeight/2;
+  let closest=children[0]; let minDiff=Infinity;
+  children.forEach(c=>{const rect=c.getBoundingClientRect(); const diff=Math.abs(rect.top+rect.height/2 - centerY); if(diff<minDiff){minDiff=diff;closest=c;}});
+  children.forEach(c=>{c.classList.remove('center');c.style.opacity='0.5';c.style.transform='scale(1)';});
+  closest.classList.add('center'); closest.style.opacity='1'; closest.style.transform='scale(1.3)';
 }
 function snapToCenter(picker){
-    const centerItem=picker.querySelector('.center');
-    if(centerItem){
-        const itemHeight=40;
-        const centerOffset=picker.offsetHeight/2 - itemHeight/2;
-        picker.scrollTop = centerItem.offsetTop - centerOffset;
-    }
+  const centerItem=picker.querySelector('.center');
+  if(centerItem){
+    const itemHeight=40, centerOffset=picker.offsetHeight/2 - itemHeight/2;
+    picker.scrollTop=centerItem.offsetTop - centerOffset;
+  }
 }
 function getPickerValue(picker){ const c=picker.querySelector('.center'); return parseInt(c?c.innerText:'0'); }
+
 function showCustomTimePicker(){
-    const now=new Date();
-    populatePicker('hourPicker', Array.from({length:24},(_,i)=>i), now.getHours());
-    populatePicker('minutePicker', Array.from({length:60},(_,i)=>i), now.getMinutes());
-    document.getElementById('timeModal').classList.add('active');
+  const now=new Date();
+  populatePicker('hourPicker',Array.from({length:24},(_,i)=>i),now.getHours());
+  populatePicker('minutePicker',Array.from({length:60},(_,i)=>i),now.getMinutes());
+  document.getElementById('timeModal').classList.add('active');
 }
 function confirmTime(){
-    const h=getPickerValue(document.getElementById('hourPicker'));
-    const m=getPickerValue(document.getElementById('minutePicker'));
-    const date=new Date();
-    date.setHours(h,m,0,0);
-    logFeedingAt(date);
-    document.getElementById('timeModal').classList.remove('active');
+  const h=getPickerValue(document.getElementById('hourPicker'));
+  const m=getPickerValue(document.getElementById('minutePicker'));
+  const date=new Date(); date.setHours(h,m,0,0);
+  logFeedingAt(date);
+  document.getElementById('timeModal').classList.remove('active');
 }
 function clearResults(){
-    document.getElementById("results").innerHTML='';
-    document.getElementById("lastFed").innerText='';
-    localStorage.removeItem('lastFed');
+  document.getElementById("results").innerHTML='';
+  document.getElementById("lastFed").innerText='';
+  localStorage.removeItem('lastFed');
 }
+
 function init(){
-    const savedTheme=localStorage.getItem('darkMode');
-    if(savedTheme!==null) document.body.classList.toggle('dark', savedTheme==='true');
-    else document.body.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
-    updateThemeIcon();
-    const lastFed=localStorage.getItem('lastFed');
-    if(lastFed) logFeedingAt(new Date(lastFed));
+  const savedTheme=localStorage.getItem('darkMode');
+  if(savedTheme!==null) document.body.classList.toggle('dark',savedTheme==='true');
+  else document.body.classList.toggle('dark',window.matchMedia('(prefers-color-scheme: dark)').matches);
+  updateThemeIcon();
+  const lastFed=localStorage.getItem('lastFed');
+  if(lastFed) logFeedingAt(new Date(lastFed));
 }
 init();
 </script>
