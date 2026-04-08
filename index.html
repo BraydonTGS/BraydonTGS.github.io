@@ -24,61 +24,75 @@ body.dark {
     --muted: #cfcfcf;
 }
 
+/* ✅ FIX: remove flex centering (caused floating buttons issue) */
 body {
     margin: 0;
-    font-family: -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
 }
 
-/* ✅ TRUE FIXED HEADER */
+/* ✅ TRUE fixed buttons */
 .top-actions {
     position: fixed;
     top: 12px;
-    right: 12px;
+    right: 16px;
     display: flex;
-    gap: 6px;
-    z-index: 9999;
+    gap: 8px;
+    z-index: 1000;
 }
 
 .icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
     border: none;
     cursor: pointer;
     background: var(--card);
     color: var(--text);
-    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* layout fix */
+/* restore your centered layout feel */
 .container {
+    width: 90%;
     max-width: 420px;
-    margin: 70px auto 20px; /* space for header */
-    padding: 0 12px;
     text-align: center;
+    margin: 80px auto 20px;
 }
+
+h1 { margin-bottom: 10px; }
+p { color: var(--muted); }
 
 .card {
     background: var(--card);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 button.main {
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: 12px;
+    padding: 14px;
     width: 100%;
-    font-size: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-/* tighter list */
+button.main:hover { background: var(--secondary); }
+button.main:active { transform: scale(0.97); }
+
+/* slightly tighter but same feel */
 .results {
-    margin-top: 12px;
+    margin-top: 16px;
     text-align: left;
 }
 
@@ -86,9 +100,8 @@ button.main {
     display: flex;
     justify-content: space-between;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 4px;
-    font-size: 14px;
     cursor: pointer;
 }
 
@@ -98,19 +111,20 @@ button.main {
 }
 
 .small {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
-    margin-top: 6px;
+    margin-top: 10px;
 }
 
 .countdown {
     margin-top: 6px;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .status {
     font-size: 12px;
     margin-top: 4px;
+    color: var(--muted);
 }
 </style>
 </head>
@@ -122,7 +136,8 @@ button.main {
 </div>
 
 <div class="container">
-    <h2>🌿 Next Feed</h2>
+    <h1>🌿 Next Feed</h1>
+    <p>Tap once. Stay simple.</p>
 
     <div class="card">
         <button class="main" onclick="logFeeding()">Log Feeding</button>
@@ -152,7 +167,7 @@ function logFeeding() {
     localStorage.setItem("lastFed", now);
 
     document.getElementById("lastFed").innerText =
-        "Last fed: " + formatTime(now);
+        "Last fed at: " + formatTime(now);
 
     renderResults(now);
     scheduleNotification(now);
@@ -173,7 +188,7 @@ function renderResults(baseTime) {
         if (hour === defaultInterval) div.classList.add("selected");
 
         div.innerHTML = `
-            <span>${hour}h</span>
+            <span>${hour} hr</span>
             <span>${formatTime(next)}</span>
         `;
 
@@ -270,7 +285,7 @@ function init() {
     if (lastFed) {
         const date = new Date(lastFed);
         document.getElementById("lastFed").innerText =
-            "Last fed: " + formatTime(date);
+            "Last fed at: " + formatTime(date);
 
         renderResults(date);
         startCountdown();
