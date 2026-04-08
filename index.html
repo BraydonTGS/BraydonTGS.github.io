@@ -6,244 +6,193 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-    --bg: #f4f1ea;
-    --card: #ffffff;
-    --primary: #7a8f7b;
-    --secondary: #a3b18a;
-    --text: #3a3a3a;
-    --muted: #7d7d7d;
-}
-body.dark {
-    --bg: #1f2a24;
-    --card: #2c3a33;
-    --primary: #a3b18a;
-    --secondary: #7a8f7b;
-    --text: #f1f1f1;
-    --muted: #cfcfcf;
-}
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-.container {
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    position: relative;
-}
-.top-buttons {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    gap: 10px;
-}
+    :root {
+        --bg: #f4f1ea;
+        --card: #ffffff;
+        --primary: #7a8f7b;
+        --secondary: #a3b18a;
+        --text: #3a3a3a;
+        --muted: #7d7d7d;
+    }
+
+    body.dark {
+        --bg: #1f2a24;
+        --card: #2c3a33;
+        --primary: #a3b18a;
+        --secondary: #7a8f7b;
+        --text: #f1f1f1;
+        --muted: #cfcfcf;
+    }
+
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 420px;
+        text-align: center;
+        position: relative;
+    }
+
+    h1 { margin-bottom: 10px; }
+    p { color: var(--muted); }
+
+    .card {
+        background: var(--card);
+        border-radius: 20px;
+        padding: 23px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        width: 100%;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    button:hover { background: var(--secondary); }
+    button:active {
+        transform: scale(0.97);
+    }
+    
 .icon-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 10px);
+    right: 16px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-}
-.card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 23px;
-    margin-top: 50px;
-}
-button.main {
-    width: 100%;
-    padding: 14px;
-    margin-top: 10px;
-    border-radius: 12px;
-    border: none;
-    background: var(--primary);
-    color: white;
-    font-size: 16px;
-}
-.results { margin-top: 20px; text-align: left; }
-
-/* Picker */
-.picker-container {
     display: flex;
-    height: 140px;
-    overflow: hidden;
-    position: relative;
-    margin: 10px 0;
-}
-.picker {
-    flex: 1;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    padding: 60px 0;
-}
-.picker div {
-    height: 40px;
-    line-height: 40px;
-    scroll-snap-align: center;
-    color: var(--muted);
-}
-.picker .center {
-    color: var(--primary);
-    font-weight: bold;
-    transform: scale(1.2);
-}
-
-/* Modal */
-.modal-bg {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
     align-items: center;
-    opacity: 0;
-    pointer-events: none;
+    justify-content: center;
+    font-size: 18px;
+    padding: 0;
+    z-index: 1000;
+
+    opacity: 0.85;
+    backdrop-filter: blur(6px);
 }
-.modal-bg.active {
+
+.icon-btn:hover {
     opacity: 1;
-    pointer-events: auto;
 }
-.modal {
-    background: var(--card);
-    padding: 20px;
-    border-radius: 20px;
-}
+    .results {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeIn 0.4s ease forwards;
+    }
+
+    .result-item:nth-child(1) { animation-delay: 0.05s; }
+    .result-item:nth-child(2) { animation-delay: 0.1s; }
+    .result-item:nth-child(3) { animation-delay: 0.15s; }
+    .result-item:nth-child(4) { animation-delay: 0.2s; }
+    .result-item:nth-child(5) { animation-delay: 0.25s; }
+    .result-item:nth-child(6) { animation-delay: 0.3s; }
+    .result-item:nth-child(7) { animation-delay: 0.35s; }
+    .result-item:nth-child(8) { animation-delay: 0.4s; }
+    .result-item:nth-child(9) { animation-delay: 0.45s; }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .small { font-size: 13px; color: var(--muted); margin-top: 10px; }
 </style>
 </head>
-
 <body>
-
+    
+<button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+    
 <div class="container">
-
-    <div class="top-buttons">
-        <button class="icon-btn" onclick="clearResults()">⟳</button>
-        <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
-    </div>
-
     <h1>🌿 Next Feed</h1>
+    <p>Tap once. Stay simple.</p>
 
     <div class="card">
-        <button class="main" onclick="logFeeding()">Log Feeding</button>
-        <button class="main" onclick="showPicker()">Select Time</button>
-        <div id="lastFed"></div>
+        <button onclick="logFeeding()">Log Feeding</button>
+
+        <div class="small" id="lastFed"></div>
+
         <div class="results" id="results"></div>
     </div>
 </div>
 
-<div class="modal-bg" id="modal">
-    <div class="modal">
-        <div class="picker-container">
-            <div class="picker" id="hours"></div>
-            <div class="picker" id="minutes"></div>
-        </div>
-        <button class="main" onclick="confirm()">Set Time</button>
-    </div>
-</div>
-
 <script>
-function formatTime(d){
-    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function logFeeding(){
-    logAt(new Date());
-}
-function logAt(date){
-    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
+function logFeeding() {
+    const now = new Date();
 
-    const intervals=[1,2,3,4];
-    document.getElementById("results").innerHTML =
-        intervals.map(h=>{
-            const next = new Date(date.getTime()+h*3600000);
-            return `<div>${h} hr → ${formatTime(next)}</div>`;
-        }).join('');
-}
+    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
+    localStorage.setItem("lastFed", now);
 
-function toggleDarkMode(){
-    document.body.classList.toggle("dark");
-}
+    const resultsDiv = document.getElementById("results");
 
-function clearResults(){
-    document.getElementById("results").innerHTML='';
-    document.getElementById("lastFed").innerText='';
-}
+    const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
 
-/* ===== FIXED PICKER ===== */
+    let html = "";
 
-let userScrolling = false;
-
-function createPicker(el, max, value){
-    el.innerHTML = "";
-
-    for(let i=0;i<max;i++){
-        const d=document.createElement("div");
-        d.innerText=i.toString().padStart(2,'0');
-        el.appendChild(d);
-    }
-
-    const itemHeight=40;
-    el.scrollTop = value * itemHeight;
-
-    highlight(el);
-
-    el.onscroll = () => {
-        userScrolling = true;
-        highlight(el);
-    };
-}
-
-function highlight(el){
-    const items=[...el.children];
-    const center = el.scrollTop + el.offsetHeight/2;
-
-    let closest=null, min=Infinity;
-
-    items.forEach(i=>{
-        const y=i.offsetTop + 20;
-        const diff=Math.abs(y-center);
-        if(diff<min){min=diff;closest=i;}
+    intervals.forEach(hour => {
+        const next = new Date(now.getTime() + hour * 3600000);
+        html += `<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
     });
 
-    items.forEach(i=>i.classList.remove("center"));
-    if(closest) closest.classList.add("center");
+    resultsDiv.innerHTML = html;
 }
 
-function getValue(el){
-    const c=el.querySelector(".center");
-    return parseInt(c.innerText);
+function updateThemeIcon() {
+    const isDark = document.body.classList.contains("dark");
+    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
 }
 
-function showPicker(){
-    const now=new Date();
-
-    createPicker(hours,24,now.getHours());
-    createPicker(minutes,60,now.getMinutes());
-
-    document.getElementById("modal").classList.add("active");
+function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("darkMode", isDark);
+    updateThemeIcon();
 }
 
-function confirm(){
-    const h=getValue(hours);
-    const m=getValue(minutes);
+function init() {
+    const lastFed = localStorage.getItem("lastFed");
+    if (lastFed) {
+        document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(new Date(lastFed));
+    }
 
-    const d=new Date();
-    d.setHours(h,m,0,0);
+    if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+    }
 
-    logAt(d);
-
-    document.getElementById("modal").classList.remove("active");
+    updateThemeIcon();
 }
+
+init();
 </script>
 
 </body>
