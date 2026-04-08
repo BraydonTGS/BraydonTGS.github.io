@@ -165,6 +165,7 @@ function renderResults(baseTime) {
 
     resultsDiv.innerHTML = "";
 
+    // "Now" row
     const nowDiv = document.createElement("div");
     nowDiv.className = "result-item";
     nowDiv.innerHTML = `<span>Now</span><span>${formatTime(baseTime)}</span>`;
@@ -223,8 +224,13 @@ function updateNotifIcon() {
     else btn.innerText = "🔕";
 }
 
+// Request permission and update icon
 function requestNotif() {
-    Notification.requestPermission().then(updateNotifIcon);
+    if (Notification.permission === "default") {
+        Notification.requestPermission().then(updateNotifIcon);
+    } else {
+        updateNotifIcon();
+    }
 }
 
 function scheduleNotification(baseTime) {
