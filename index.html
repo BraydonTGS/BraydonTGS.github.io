@@ -13,7 +13,15 @@
         --secondary: #a3b18a;
         --text: #3a3a3a;
         --muted: #7d7d7d;
-        --shadow: rgba(0,0,0,0.05);
+    }
+
+    body.dark {
+        --bg: #1f2a24;
+        --card: #2c3a33;
+        --primary: #a3b18a;
+        --secondary: #7a8f7b;
+        --text: #f1f1f1;
+        --muted: #cfcfcf;
     }
 
     body {
@@ -24,7 +32,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        min-height: 100vh;
     }
 
     .container {
@@ -33,110 +41,151 @@
         text-align: center;
     }
 
-    h1 {
-        font-weight: 500;
-        margin-bottom: 10px;
-    }
-
-    p {
-        color: var(--muted);
-        margin-bottom: 30px;
-    }
+    h1 { margin-bottom: 10px; }
+    p { color: var(--muted); }
 
     .card {
         background: var(--card);
         border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 10px 25px var(--shadow);
+        padding: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
 
-    button {
+    button, select {
         background: var(--primary);
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 15px 25px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.2s;
+        border-radius: 10px;
+        padding: 12px;
         width: 100%;
+        margin-top: 10px;
+        font-size: 15px;
     }
 
-    button:hover {
-        background: var(--secondary);
-    }
+    button:hover { background: var(--secondary); }
 
-    .results {
-        margin-top: 25px;
+    .results, .history {
+        margin-top: 20px;
         text-align: left;
     }
 
     .result-item {
         display: flex;
         justify-content: space-between;
-        padding: 10px 0;
+        padding: 8px 0;
         border-bottom: 1px solid #eee;
-        font-size: 16px;
     }
 
-    .time {
-        font-weight: 500;
-    }
-
-    .footer {
-        margin-top: 20px;
-        font-size: 12px;
-        color: var(--muted);
-    }
+    .small { font-size: 13px; color: var(--muted); }
 </style>
 </head>
-
 <body>
 
 <div class="container">
     <h1>🌿 Feeding Tracker</h1>
-    <p>Tap below after a feeding to see upcoming times</p>
+    <p>Simple + calm scheduling</p>
 
     <div class="card">
-        <button onclick="calculateFeedTimes()">Log Feeding</button>
+        <button onclick="logFeeding()">Log Feeding</button>
+
+        <div class="small" id="lastFed"></div>
+
+        <select id="intervalSelect">
+            <option value="1">1 hour</option>
+            <option value="2">2 hours</option>
+            <option value="3" selected>3 hours</option>
+            <option value="4">4 hours</option>
+            <option value="5">5 hours</option>
+        </select>
+
+        <button onclick="toggleDarkMode()">Toggle Night Mode</button>
 
         <div class="results" id="results"></div>
-    </div>
 
-    <div class="footer">
-        Calm. Simple. On schedule.
+        <div class="history" id="history"></div>
     </div>
 </div>
 
 <script>
 function formatTime(date) {
-    return date.toLocaleTimeString([], {
-        hour: 'numeric',
-        minute: '2-digit'
-    });
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function calculateFeedTimes() {
-    const now = new Date();
-    const resultsDiv = document.getElementById("results");
+function saveHistory(time) {
+    let history = JSON.parse(localStorage.getItem("feedHistory") || "[]");
+    history.unshift(time);
+    history = history.slice(0, 10);
+    localStorage.setItem("feedHistory", JSON.stringify(history));
+    renderHistory();
+}
 
-    const intervals = [1, 2, 3, 4, 5];
+function renderHistory() {
+    const history = JSON.parse(localStorage.getItem("feedHistory") || "[]");
+    const container = document.getElementById("history");
+
+    container.innerHTML = "<h4>Recent Feedings</h4>" + history.map(t => `<div class="small">${t}</div>`).join("");
+}
+
+function scheduleNotification(nextTime) {
+    if (Notification.permission === "granted") {
+        const delay = nextTime - new Date();
+        setTimeout(() => {
+            new Notification("Feeding Reminder 🍼", {
+                body: "Time for the next feeding"
+            });
+        }, delay);
+    }
+}
+
+function logFeeding() {
+    const now = new Date();
+    const interval = parseInt(document.getElementById("intervalSelect").value);
+
+    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
+    localStorage.setItem("lastFed", now);
+
+    saveHistory(formatTime(now));
+
+    const resultsDiv = document.getElementById("results");
+    const intervals = [1,2,3,4,5];
 
     let html = "";
 
     intervals.forEach(hour => {
-        const next = new Date(now.getTime() + hour * 60 * 60 * 1000);
+        const next = new Date(now.getTime() + hour * 3600000);
+        html += `<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
 
-        html += `
-            <div class="result-item">
-                <span>${hour} hour${hour > 1 ? "s" : ""}</span>
-                <span class="time">${formatTime(next)}</span>
-            </div>
-        `;
+        if (hour === interval) {
+            scheduleNotification(next);
+        }
     });
 
     resultsDiv.innerHTML = html;
 }
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+}
+
+function init() {
+    const lastFed = localStorage.getItem("lastFed");
+    if (lastFed) {
+        document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(new Date(lastFed));
+    }
+
+    if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+    }
+
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    renderHistory();
+}
+
+init();
 </script>
 
 </body>
