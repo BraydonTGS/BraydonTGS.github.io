@@ -38,7 +38,7 @@ body {
 .container { width: 90%; max-width: 420px; text-align: center; position: relative; }
 h1 { margin-bottom: 10px; }
 p { color: var(--muted); }
-.card { background: var(--card); border-radius: 20px; padding: 23px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+.card { background: var(--card); border-radius: 20px; padding: 23px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
 button { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 10px; }
 button:hover { background: var(--secondary); }
 button:active { transform: scale(0.97); }
@@ -72,6 +72,9 @@ button:active { transform: scale(0.97); }
 
 /* Center highlight border */
 .picker-container::after { content:""; position:absolute; top:50%; left:0; width:100%; height:40px; border: 2px solid var(--primary); border-radius:12px; transform: translateY(-50%); pointer-events:none; }
+
+/* Clear button inside card */
+.card .icon-btn { position: absolute; bottom: 10px; right: 10px; top: auto; }
 </style>
 </head>
 <body>
@@ -87,6 +90,7 @@ button:active { transform: scale(0.97); }
         <button onclick="showCustomTimePicker()">Select Time</button>
         <div class="small" id="lastFed"></div>
         <div class="results" id="results"></div>
+        <button class="icon-btn" onclick="clearResults()">🔄</button>
     </div>
 </div>
 
@@ -151,15 +155,16 @@ function populatePicker(id, range, value) {
     });
     for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
     
-    setTimeout(() => scrollToCenter(picker, value+pad),50);
+    setTimeout(() => scrollToCenter(picker, value),50);
     picker.addEventListener('scroll', () => centerHighlight(picker));
 }
 
 // Scroll picker so index is in center
 function scrollToCenter(picker, index) {
     const itemHeight = 40;
+    const pad = 2;
     const centerOffset = picker.offsetHeight / 2 - itemHeight/2;
-    picker.scrollTop = index*itemHeight - centerOffset;
+    picker.scrollTop = (index + pad) * itemHeight - centerOffset;
     centerHighlight(picker);
 }
 
@@ -200,6 +205,13 @@ function confirmTime() {
     date.setHours(h,m,0,0);
     logFeedingAt(date);
     document.getElementById('timeModal').classList.remove('active');
+}
+
+// Clear results
+function clearResults() {
+    document.getElementById("results").innerHTML = '';
+    document.getElementById("lastFed").innerText = '';
+    localStorage.removeItem('lastFed');
 }
 
 // Init
