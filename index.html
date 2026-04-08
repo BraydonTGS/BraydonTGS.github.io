@@ -128,6 +128,7 @@ button:active { transform: scale(0.97); }
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
+    z-index: 999;
 }
 
 .modal-bg.active {
@@ -139,7 +140,7 @@ button:active { transform: scale(0.97); }
     background: var(--card);
     border-radius: 20px;
     padding: 20px;
-    width: 250px;
+    width: 260px;
     text-align: center;
     transform: translateY(-10px);
     transition: transform 0.25s ease;
@@ -149,13 +150,13 @@ button:active { transform: scale(0.97); }
     transform: translateY(0);
 }
 
-/* Wheel picker styles */
+/* Wheel picker */
 .picker-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    height: 120px;
+    height: 140px;
     overflow: hidden;
     position: relative;
     margin: 10px 0;
@@ -172,6 +173,7 @@ button:active { transform: scale(0.97); }
     padding: 10px 0;
     text-align: center;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    position: relative;
 }
 
 .picker div {
@@ -180,12 +182,27 @@ button:active { transform: scale(0.97); }
     scroll-snap-align: center;
     font-size: 18px;
     color: var(--text);
+    transition: all 0.2s;
 }
 
 .picker div.selected {
     font-size: 22px;
     font-weight: bold;
     color: var(--primary);
+}
+
+/* Center highlight overlay */
+.picker-container::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
 }
 </style>
 </head>
@@ -257,31 +274,39 @@ function toggleDarkMode() {
     updateThemeIcon();
 }
 
-// Wheel Picker Functions
+// Wheel Picker
 function populatePicker(id, range) {
     const picker = document.getElementById(id);
     picker.innerHTML = "";
     range.forEach(val => {
         const div = document.createElement("div");
-        div.innerText = val.toString().padStart(2, "0");
+        div.innerText = val.toString().padStart(2,"0");
         picker.appendChild(div);
     });
-    // Center on middle value
-    picker.scrollTop = picker.children[0].offsetHeight * Math.floor(range.length/2);
+    centerSelected(picker);
+    picker.addEventListener("scroll", () => centerSelected(picker));
 }
 
-// Get selected value from picker
-function getSelectedValue(picker) {
+// Center highlight
+function centerSelected(picker) {
     const children = Array.from(picker.children);
-    const scrollTop = picker.scrollTop;
     const height = children[0].offsetHeight;
+    const scrollTop = picker.scrollTop;
     const index = Math.round(scrollTop / height);
-    return parseInt(children[index].innerText);
+
+    children.forEach((c,i)=> c.classList.toggle("selected", i===index));
+    // Snap to center
+    picker.scrollTop = index * height;
+}
+
+function getSelectedValue(picker) {
+    const selected = picker.querySelector(".selected");
+    return parseInt(selected.innerText);
 }
 
 function showCustomTimePicker() {
-    populatePicker("hourPicker", Array.from({length:24}, (_,i)=>i));
-    populatePicker("minutePicker", Array.from({length:60}, (_,i)=>i));
+    populatePicker("hourPicker", Array.from({length:24},(_,i)=>i));
+    populatePicker("minutePicker", Array.from({length:60},(_,i)=>i));
     document.getElementById("timeModal").classList.add("active");
 }
 
@@ -289,26 +314,24 @@ function confirmTime() {
     const h = getSelectedValue(document.getElementById("hourPicker"));
     const m = getSelectedValue(document.getElementById("minutePicker"));
     const date = new Date();
-    date.setHours(h, m, 0, 0);
+    date.setHours(h,m,0,0);
     logFeedingAt(date);
     document.getElementById("timeModal").classList.remove("active");
 }
 
 // Init app
 function init() {
-    // Theme: system preference or saved
     const savedTheme = localStorage.getItem("darkMode");
-    if (savedTheme !== null) {
-        document.body.classList.toggle("dark", savedTheme === "true");
+    if(savedTheme!==null){
+        document.body.classList.toggle("dark",savedTheme==="true");
     } else {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.body.classList.toggle("dark", prefersDark);
+        document.body.classList.toggle("dark",prefersDark);
     }
     updateThemeIcon();
 
-    // Last fed
     const lastFed = localStorage.getItem("lastFed");
-    if (lastFed) {
+    if(lastFed){
         document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(new Date(lastFed));
     }
 }
