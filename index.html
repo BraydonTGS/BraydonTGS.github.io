@@ -6,126 +6,105 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    :root {
-        --bg: #f4f1ea;
-        --card: #ffffff;
-        --primary: #7a8f7b;
-        --secondary: #a3b18a;
-        --text: #3a3a3a;
-        --muted: #7d7d7d;
-    }
+:root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --primary: #7a8f7b;
+    --secondary: #a3b18a;
+    --text: #3a3a3a;
+    --muted: #7d7d7d;
+}
 
-    body.dark {
-        --bg: #1f2a24;
-        --card: #2c3a33;
-        --primary: #a3b18a;
-        --secondary: #7a8f7b;
-        --text: #f1f1f1;
-        --muted: #cfcfcf;
-    }
+body.dark {
+    --bg: #1f2a24;
+    --card: #2c3a33;
+    --primary: #a3b18a;
+    --secondary: #7a8f7b;
+    --text: #f1f1f1;
+    --muted: #cfcfcf;
+}
 
-    body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-    }
+body {
+    margin: 0;
+    font-family: -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
 
-    .container {
-        width: 90%;
-        max-width: 420px;
-        text-align: center;
-    }
+.container {
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+}
 
-    .top-actions {
-        position: fixed;
-        top: calc(env(safe-area-inset-top) + 10px);
-        right: 16px;
-        display: flex;
-        gap: 8px;
-        z-index: 1000;
-    }
+.top-actions {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 10px);
+    right: 16px;
+    display: flex;
+    gap: 8px;
+}
 
-    .icon-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        border: none;
-        cursor: pointer;
-        opacity: 0.85;
-        backdrop-filter: blur(6px);
-    }
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    opacity: 0.85;
+}
 
-    .icon-btn:hover { opacity: 1; }
+.card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+}
 
-    h1 { margin-bottom: 10px; }
-    p { color: var(--muted); }
+button.main {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    font-size: 16px;
+}
 
-    .card {
-        background: var(--card);
-        border-radius: 20px;
-        padding: 23px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    }
+.results {
+    margin-top: 20px;
+    text-align: left;
+    max-height: 260px;
+    overflow-y: auto;
+}
 
-    button.main {
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 14px;
-        width: 100%;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
 
-    button.main:hover { background: var(--secondary); }
-    button.main:active { transform: scale(0.97); }
+.result-item.selected {
+    background: var(--primary);
+    color: white;
+}
 
-    .results {
-        margin-top: 20px;
-        text-align: left;
-    }
+.small {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 10px;
+}
 
-    .result-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 4px;
-        cursor: pointer;
-
-        opacity: 0;
-        transform: translateY(10px);
-        animation: fadeIn 0.4s ease forwards;
-    }
-
-    .result-item.selected {
-        background: var(--primary);
-        color: white;
-    }
-
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .small {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 10px;
-    }
+.countdown {
+    margin-top: 8px;
+    font-size: 14px;
+}
 </style>
 </head>
 <body>
@@ -143,12 +122,14 @@
         <button class="main" onclick="logFeeding()">Log Feeding</button>
 
         <div class="small" id="lastFed"></div>
+        <div class="countdown" id="countdown"></div>
         <div class="results" id="results"></div>
     </div>
 </div>
 
 <script>
 const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
+let countdownTimer;
 
 function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -156,11 +137,14 @@ function formatTime(date) {
 
 function logFeeding() {
     const now = new Date();
-
-    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
     localStorage.setItem("lastFed", now);
 
+    document.getElementById("lastFed").innerText =
+        "Last fed at: " + formatTime(now);
+
     renderResults(now);
+    scheduleNotification(now);
+    startCountdown();
 }
 
 function renderResults(baseTime) {
@@ -174,13 +158,23 @@ function renderResults(baseTime) {
         const isSelected = hour === defaultInterval;
 
         html += `
-        <div class="result-item ${isSelected ? "selected" : ""}" onclick="setDefault(${hour})">
+        <div class="result-item ${isSelected ? "selected" : ""}" data-hour="${hour}">
             <span>${hour} hr</span>
             <span>${formatTime(next)}</span>
         </div>`;
     });
 
     resultsDiv.innerHTML = html;
+
+    document.querySelectorAll(".result-item").forEach(el => {
+        el.onclick = () => setDefault(parseFloat(el.dataset.hour));
+    });
+
+    // auto-scroll
+    const selected = document.querySelector(".selected");
+    if (selected) {
+        selected.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
 }
 
 function setDefault(hour) {
@@ -189,25 +183,66 @@ function setDefault(hour) {
     const lastFed = localStorage.getItem("lastFed");
     if (lastFed) {
         renderResults(new Date(lastFed));
+        scheduleNotification(new Date(lastFed));
+        startCountdown();
     }
+}
+
+function startCountdown() {
+    clearInterval(countdownTimer);
+
+    countdownTimer = setInterval(() => {
+        const lastFed = localStorage.getItem("lastFed");
+        const interval = parseFloat(localStorage.getItem("defaultInterval"));
+
+        if (!lastFed || !interval) return;
+
+        const next = new Date(new Date(lastFed).getTime() + interval * 3600000);
+        const diff = next - new Date();
+
+        if (diff <= 0) {
+            document.getElementById("countdown").innerText = "Time to feed";
+            return;
+        }
+
+        const mins = Math.floor(diff / 60000);
+        document.getElementById("countdown").innerText =
+            `Next in ${mins} min`;
+    }, 60000);
+
+    // run immediately
+    document.getElementById("countdown").innerText = "";
+}
+
+function scheduleNotification(baseTime) {
+    const interval = parseFloat(localStorage.getItem("defaultInterval"));
+    if (!interval) return;
+
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+        return;
+    }
+
+    const delay = interval * 3600000;
+
+    setTimeout(() => {
+        new Notification("🌿 Time to feed");
+    }, delay);
 }
 
 function clearAll() {
     localStorage.removeItem("lastFed");
     document.getElementById("lastFed").innerText = "";
     document.getElementById("results").innerHTML = "";
-}
-
-function updateThemeIcon() {
-    const isDark = document.body.classList.contains("dark");
-    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+    document.getElementById("countdown").innerText = "";
+    clearInterval(countdownTimer);
 }
 
 function toggleDarkMode() {
     document.body.classList.toggle("dark");
     const isDark = document.body.classList.contains("dark");
     localStorage.setItem("darkMode", isDark);
-    updateThemeIcon();
+    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
 }
 
 function init() {
@@ -215,15 +250,19 @@ function init() {
 
     if (lastFed) {
         const date = new Date(lastFed);
-        document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
+        document.getElementById("lastFed").innerText =
+            "Last fed at: " + formatTime(date);
+
         renderResults(date);
+        startCountdown();
     }
 
     if (localStorage.getItem("darkMode") === "true") {
         document.body.classList.add("dark");
     }
 
-    updateThemeIcon();
+    document.getElementById("themeBtn").innerText =
+        document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 init();
