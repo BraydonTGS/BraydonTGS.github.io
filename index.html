@@ -24,7 +24,6 @@ body.dark {
     --muted: #cfcfcf;
 }
 
-/* ✅ FIX: remove flex centering (caused floating buttons issue) */
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -32,7 +31,6 @@ body {
     color: var(--text);
 }
 
-/* ✅ TRUE fixed buttons */
 .top-actions {
     position: fixed;
     top: 12px;
@@ -57,7 +55,6 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* restore your centered layout feel */
 .container {
     width: 90%;
     max-width: 420px;
@@ -90,7 +87,6 @@ button.main {
 button.main:hover { background: var(--secondary); }
 button.main:active { transform: scale(0.97); }
 
-/* slightly tighter but same feel */
 .results {
     margin-top: 16px;
     text-align: left;
@@ -120,18 +116,13 @@ button.main:active { transform: scale(0.97); }
     margin-top: 6px;
     font-size: 14px;
 }
-
-.status {
-    font-size: 12px;
-    margin-top: 4px;
-    color: var(--muted);
-}
 </style>
 </head>
 <body>
 
 <div class="top-actions">
     <button class="icon-btn" onclick="clearAll()">🔄</button>
+    <button class="icon-btn" id="notifBtn" onclick="requestNotif()">🔕</button>
     <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
 </div>
 
@@ -144,7 +135,6 @@ button.main:active { transform: scale(0.97); }
 
         <div class="small" id="lastFed"></div>
         <div class="countdown" id="countdown"></div>
-        <div class="status" id="notifStatus"></div>
 
         <div class="results" id="results"></div>
     </div>
@@ -155,19 +145,14 @@ const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
 let countdownTimer;
 
 function formatTime(date) {
-    return date.toLocaleTimeString([], {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: undefined
-    });
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: undefined });
 }
 
 function logFeeding() {
     const now = new Date();
     localStorage.setItem("lastFed", now);
 
-    document.getElementById("lastFed").innerText =
-        "Last fed at: " + formatTime(now);
+    document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
 
     renderResults(now);
     scheduleNotification(now);
@@ -180,6 +165,11 @@ function renderResults(baseTime) {
 
     resultsDiv.innerHTML = "";
 
+    const nowDiv = document.createElement("div");
+    nowDiv.className = "result-item";
+    nowDiv.innerHTML = `<span>Now</span><span>${formatTime(baseTime)}</span>`;
+    resultsDiv.appendChild(nowDiv);
+
     intervals.forEach(hour => {
         const next = new Date(baseTime.getTime() + hour * 3600000);
         const div = document.createElement("div");
@@ -187,11 +177,7 @@ function renderResults(baseTime) {
         div.className = "result-item";
         if (hour === defaultInterval) div.classList.add("selected");
 
-        div.innerHTML = `
-            <span>${hour} hr</span>
-            <span>${formatTime(next)}</span>
-        `;
-
+        div.innerHTML = `<span>${hour} hr</span><span>${formatTime(next)}</span>`;
         div.onclick = () => setDefault(hour);
 
         resultsDiv.appendChild(div);
@@ -200,7 +186,6 @@ function renderResults(baseTime) {
 
 function setDefault(hour) {
     localStorage.setItem("defaultInterval", hour);
-
     const lastFed = localStorage.getItem("lastFed");
     if (lastFed) {
         renderResults(new Date(lastFed));
@@ -227,21 +212,19 @@ function startCountdown() {
         }
 
         const mins = Math.floor(diff / 60000);
-        document.getElementById("countdown").innerText =
-            `Next in ${mins} min`;
+        document.getElementById("countdown").innerText = `Next in ${mins} min`;
     }, 60000);
 }
 
-function updateNotifStatus() {
-    const status = document.getElementById("notifStatus");
+// ✅ Notification icon handling
+function updateNotifIcon() {
+    const btn = document.getElementById("notifBtn");
+    if (Notification.permission === "granted") btn.innerText = "🔔";
+    else btn.innerText = "🔕";
+}
 
-    if (Notification.permission === "granted") {
-        status.innerText = "🔔 Notifications on";
-    } else if (Notification.permission === "denied") {
-        status.innerText = "🔕 Notifications blocked";
-    } else {
-        status.innerText = "🔕 Notifications off";
-    }
+function requestNotif() {
+    Notification.requestPermission().then(updateNotifIcon);
 }
 
 function scheduleNotification(baseTime) {
@@ -249,26 +232,19 @@ function scheduleNotification(baseTime) {
     if (!interval) return;
 
     if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(updateNotifStatus);
+        Notification.requestPermission().then(updateNotifIcon);
         return;
     }
 
-    updateNotifStatus();
-
     const delay = interval * 3600000;
-
-    setTimeout(() => {
-        new Notification("🌿 Time to feed");
-    }, delay);
+    setTimeout(() => new Notification("🌿 Time to feed"), delay);
 }
 
 function clearAll() {
-    localStorage.removeItem("lastFed"); // ✅ keep default
-
+    localStorage.removeItem("lastFed"); // keep default
     document.getElementById("lastFed").innerText = "";
     document.getElementById("results").innerHTML = "";
     document.getElementById("countdown").innerText = "";
-
     clearInterval(countdownTimer);
 }
 
@@ -284,9 +260,7 @@ function init() {
 
     if (lastFed) {
         const date = new Date(lastFed);
-        document.getElementById("lastFed").innerText =
-            "Last fed at: " + formatTime(date);
-
+        document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
         renderResults(date);
         startCountdown();
     }
@@ -295,10 +269,9 @@ function init() {
         document.body.classList.add("dark");
     }
 
-    document.getElementById("themeBtn").innerText =
-        document.body.classList.contains("dark") ? "☀️" : "🌙";
+    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
 
-    updateNotifStatus();
+    updateNotifIcon();
 }
 
 init();
