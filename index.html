@@ -201,14 +201,14 @@ button:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
-
+    
+<button class="theme-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+<button class="clear-btn" onclick="clearResults()">⟳</button>
+    
 <div class="container">
     <h1>🌿 Next Feed</h1>
     <p>Tap once. Stay simple.</p>
-
     <div class="card">
-        <button class="theme-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
-        <button class="clear-btn" onclick="clearResults()">⟳</button>
         <button onclick="logFeeding()">Log Feeding</button>
         <button onclick="showCustomTimePicker()">Select Time</button>
         <div class="small" id="lastFed"></div>
