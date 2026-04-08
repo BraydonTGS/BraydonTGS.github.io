@@ -156,10 +156,10 @@ button:active {transform:scale(0.97);}
   pointer-events:none;
 }
 
-/* Floating buttons outside card */
+/* Floating buttons in top corners */
 .theme-btn{
   position:fixed;
-  top:calc(env(safe-area-inset-top,20px)+10px);
+  top:16px;
   right:16px;
   width:40px;height:40px;
   border-radius:50%;
@@ -175,7 +175,7 @@ button:active {transform:scale(0.97);}
 .theme-btn:hover{opacity:1;}
 .clear-btn{
   position:fixed;
-  top:calc(env(safe-area-inset-top,20px)+10px);
+  top:16px;
   left:16px;
   width:40px;height:40px;
   border-radius:50%;
@@ -246,7 +246,10 @@ function updateThemeIcon(){
   document.getElementById("themeBtn").innerText=document.body.classList.contains("dark")?"☀️":"🌙";
 }
 
-// Picker functions
+// Picker
+let hourPickerInitialized=false;
+let minutePickerInitialized=false;
+
 function populatePicker(id,range,value){
   const picker=document.getElementById(id);
   picker.innerHTML='';
@@ -255,15 +258,23 @@ function populatePicker(id,range,value){
   range.forEach(v=>{const d=document.createElement('div'); d.innerText=v.toString().padStart(2,'0'); picker.appendChild(d);});
   for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
   setTimeout(()=>scrollToCenter(picker,value),50);
-  let scrollTimeout;
-  picker.addEventListener('scroll',()=>{
-    centerHighlight(picker);
-    clearTimeout(scrollTimeout);
-    scrollTimeout=setTimeout(()=>snapToCenter(picker),100);
-  });
+
+  if((id==='hourPicker' && !hourPickerInitialized)||(id==='minutePicker' && !minutePickerInitialized)){
+    picker.addEventListener('scroll',()=>{centerHighlight(picker); snapToCenterDebounced(picker);});
+    if(id==='hourPicker') hourPickerInitialized=true;
+    if(id==='minutePicker') minutePickerInitialized=true;
+  }
 }
+
+let snapTimeout;
+function snapToCenterDebounced(picker){
+  clearTimeout(snapTimeout);
+  snapTimeout=setTimeout(()=>snapToCenter(picker),100);
+}
+
 function scrollToCenter(picker,index){
-  const itemHeight=40, centerOffset=picker.offsetHeight/2 - itemHeight/2;
+  const itemHeight=40;
+  const centerOffset=picker.offsetHeight/2 - itemHeight/2;
   picker.scrollTop=(index+2)*itemHeight - centerOffset;
   centerHighlight(picker);
 }
@@ -278,7 +289,8 @@ function centerHighlight(picker){
 function snapToCenter(picker){
   const centerItem=picker.querySelector('.center');
   if(centerItem){
-    const itemHeight=40, centerOffset=picker.offsetHeight/2 - itemHeight/2;
+    const itemHeight=40;
+    const centerOffset=picker.offsetHeight/2 - itemHeight/2;
     picker.scrollTop=centerItem.offsetTop - centerOffset;
   }
 }
