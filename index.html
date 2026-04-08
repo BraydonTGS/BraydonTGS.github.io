@@ -65,8 +65,8 @@ button:active { transform: scale(0.97); }
 /* Wheel picker */
 .picker-container { display: flex; justify-content: center; align-items: center; gap: 10px; height: 140px; overflow: hidden; position: relative; margin: 10px 0; }
 .picker { flex: 1; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; border-radius: 12px; background: var(--card); padding: 60px 0; text-align: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); scroll-behavior: smooth; pointer-events: auto; }
-.picker div { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 18px; color: var(--text); transition: all 0.2s; }
-.picker div.center { font-size: 22px; font-weight: bold; color: var(--primary); }
+.picker div { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 18px; color: var(--muted); transition: all 0.2s; }
+.picker div.center { font-size: 22px; font-weight: bold; color: var(--primary); opacity: 1; transform: scale(1.3); }
 
 /* Center highlight border */
 .picker-container::after { content:""; position:absolute; top:50%; left:0; width:100%; height:40px; border: 2px solid var(--primary); border-radius:12px; transform: translateY(-50%); pointer-events:none; }
@@ -76,7 +76,7 @@ button:active { transform: scale(0.97); }
 .theme-btn:hover { opacity: 1; }
 
 /* Clear icon button inside card */
-.clear-btn { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; padding: 0; background: var(--primary); color: white; border: none; cursor: pointer; opacity: 0.85; }
+.clear-btn { position: absolute; top: 16px; right: 64px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; padding: 0; background: var(--primary); color: white; border: none; cursor: pointer; opacity: 0.85; }
 .clear-btn:hover { opacity: 1; }
 </style>
 </head>
@@ -109,21 +109,16 @@ button:active { transform: scale(0.97); }
 </div>
 
 <script>
-// Detect 24h format
 function is24HourFormat() {
     return !new Date().toLocaleTimeString().match(/AM|PM/i);
 }
-
 function formatTime(date) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: !is24HourFormat() });
 }
-
-// Log feeding
 function logFeeding() { logFeedingAt(new Date()); }
 function logFeedingAt(date) {
     document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(date);
     localStorage.setItem("lastFed", date);
-
     const resultsDiv = document.getElementById("results");
     const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
     resultsDiv.innerHTML = intervals.map(h => {
@@ -131,8 +126,6 @@ function logFeedingAt(date) {
         return `<div class="result-item"><span>${h} hr</span><span>${formatTime(next)}</span></div>`;
     }).join('');
 }
-
-// Dark mode
 function toggleDarkMode() {
     document.body.classList.toggle("dark");
     localStorage.setItem("darkMode", document.body.classList.contains("dark"));
@@ -142,17 +135,13 @@ function updateThemeIcon() {
     document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
-// Picker
+// Picker functions
 function populatePicker(id, range, value) {
     const picker = document.getElementById(id);
     picker.innerHTML = '';
     const pad = 2;
     for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
-    range.forEach(v => {
-        const div = document.createElement('div');
-        div.innerText = v.toString().padStart(2,'0');
-        picker.appendChild(div);
-    });
+    range.forEach(v => { const d=document.createElement('div'); d.innerText=v.toString().padStart(2,'0'); picker.appendChild(d); });
     for(let i=0;i<pad;i++) picker.appendChild(document.createElement('div'));
 
     scrollToCenter(picker, value);
@@ -166,73 +155,68 @@ function populatePicker(id, range, value) {
 }
 
 function scrollToCenter(picker, index) {
-    const itemHeight = 40;
-    const pad = 2;
+    const itemHeight = 40, pad=2;
     const centerOffset = picker.offsetHeight/2 - itemHeight/2;
     picker.scrollTop = (index + pad) * itemHeight - centerOffset;
     centerHighlight(picker);
 }
 
 function centerHighlight(picker) {
-    const children = Array.from(picker.children).filter(c => c.innerText);
-    const pickerRect = picker.getBoundingClientRect();
-    const centerY = pickerRect.top + pickerRect.height/2;
-    let closest = children[0], minDiff = Infinity;
-    children.forEach(c => {
-        const rect = c.getBoundingClientRect();
-        const diff = Math.abs(rect.top + rect.height/2 - centerY);
-        if(diff < minDiff) { minDiff = diff; closest = c; }
+    const children = Array.from(picker.children).filter(c=>c.innerText);
+    const centerY = picker.getBoundingClientRect().top + picker.offsetHeight/2;
+    let closest=children[0], minDiff=Infinity;
+    children.forEach(c=>{
+        const rect=c.getBoundingClientRect();
+        const diff=Math.abs(rect.top+rect.height/2-centerY);
+        if(diff<minDiff){ minDiff=diff; closest=c; }
     });
-    children.forEach(c => c.classList.remove('center'));
+    children.forEach(c=>c.classList.remove('center'));
+    children.forEach(c=>{
+        if(c!==closest) c.style.opacity='0.5'; c.style.transform='scale(1)'; // dim non-center
+    });
     closest.classList.add('center');
+    closest.style.opacity='1';
+    closest.style.transform='scale(1.3)';
 }
 
 function snapToCenter(picker) {
-    const centerItem = picker.querySelector('.center');
-    if(centerItem) {
-        const itemHeight = 40;
-        const centerOffset = picker.offsetHeight/2 - itemHeight/2;
-        picker.scrollTop = centerItem.offsetTop - centerOffset;
+    const centerItem=picker.querySelector('.center');
+    if(centerItem){
+        const itemHeight=40;
+        const centerOffset=picker.offsetHeight/2 - itemHeight/2;
+        picker.scrollTop=centerItem.offsetTop-centerOffset;
     }
 }
 
-function getPickerValue(picker) {
-    const centerItem = picker.querySelector('.center');
-    return parseInt(centerItem ? centerItem.innerText : '0');
-}
-
-function showCustomTimePicker() {
-    const now = new Date();
+function getPickerValue(picker){ const c=picker.querySelector('.center'); return parseInt(c?c.innerText:'0'); }
+function showCustomTimePicker(){
+    const now=new Date();
     populatePicker('hourPicker', Array.from({length:24},(_,i)=>i), now.getHours());
     populatePicker('minutePicker', Array.from({length:60},(_,i)=>i), now.getMinutes());
     document.getElementById('timeModal').classList.add('active');
 }
-
-function confirmTime() {
-    const h = getPickerValue(document.getElementById('hourPicker'));
-    const m = getPickerValue(document.getElementById('minutePicker'));
-    const date = new Date();
-    date.setHours(h,m,0,0);
+function confirmTime(){
+    const h=getPickerValue(document.getElementById('hourPicker'));
+    const m=getPickerValue(document.getElementById('minutePicker'));
+    const date=new Date(); date.setHours(h,m,0,0);
     logFeedingAt(date);
     document.getElementById('timeModal').classList.remove('active');
 }
-
-function clearResults() {
-    document.getElementById("results").innerHTML = '';
-    document.getElementById("lastFed").innerText = '';
+function clearResults(){
+    document.getElementById("results").innerHTML=''; 
+    document.getElementById("lastFed").innerText='';
     localStorage.removeItem('lastFed');
 }
 
-function init() {
-    const savedTheme = localStorage.getItem('darkMode');
-    if(savedTheme !== null) document.body.classList.toggle('dark', savedTheme==='true');
+function init(){
+    const savedTheme=localStorage.getItem('darkMode');
+    if(savedTheme!==null) document.body.classList.toggle('dark', savedTheme==='true');
     else document.body.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
     updateThemeIcon();
 
-    const lastFed = localStorage.getItem('lastFed');
+    const lastFed=localStorage.getItem('lastFed');
     if(lastFed) logFeedingAt(new Date(lastFed));
 }
-
 init();
 </script>
 </body>
