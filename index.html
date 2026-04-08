@@ -2,246 +2,142 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Baby Feeding Scheduler</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Slab</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: 'Courier New', monospace;
-  background: radial-gradient(circle at top, #020617, #000);
-  color: #0ff;
-  text-align: center;
-  padding: 0 10px 40px 10px;
-}
+    :root {
+        --bg: #f4f1ea;
+        --card: #ffffff;
+        --primary: #7a8f7b;
+        --secondary: #a3b18a;
+        --text: #3a3a3a;
+        --muted: #7d7d7d;
+        --shadow: rgba(0,0,0,0.05);
+    }
 
-h1 {
-  margin-top: 20px;
-  font-size: 2.2em;
-  text-shadow: 0 0 15px #0ff;
-}
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
 
-/* SEARCH */
-.search-container {
-  margin: 15px auto;
-  width: 100%;
-  max-width: 480px;
-}
+    .container {
+        width: 90%;
+        max-width: 420px;
+        text-align: center;
+    }
 
-input {
-  width: 100%;
-  padding: 12px 15px;
-  font-size: 1em;
-  border-radius: 12px;
-  border: 2px solid #0ff;
-  background: #020617;
-  color: #0ff;
-  box-shadow: 0 0 10px #0ff;
-  outline: none;
-  transition: 0.2s;
-}
+    h1 {
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
 
-input:focus {
-  box-shadow: 0 0 20px #38bdf8;
-  border-color: #38bdf8;
-}
+    p {
+        color: var(--muted);
+        margin-bottom: 30px;
+    }
 
-/* RESULTS GRID */
-.results {
-  margin-top: 25px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 15px;
-  justify-items: center;
-  padding-bottom: 30px;
-}
+    .card {
+        background: var(--card);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 25px var(--shadow);
+    }
 
-/* CARD */
-.card {
-  background: rgba(2,6,23,0.95);
-  border: 2px solid #0ff;
-  border-radius: 16px;
-  overflow: hidden;
-  width: 100%;
-  max-width: 220px;
-  box-shadow: 0 0 15px #0ff;
-  display: flex;
-  flex-direction: column;
-  transition: 0.3s;
-}
+    button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 15px 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+        width: 100%;
+    }
 
-.card:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 0 25px #38bdf8;
-}
+    button:hover {
+        background: var(--secondary);
+    }
 
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-bottom: 2px solid #0ff;
-}
+    .results {
+        margin-top: 25px;
+        text-align: left;
+    }
 
-/* CARD BODY */
-.card .title {
-  padding: 10px;
-  font-weight: bold;
-  font-size: 0.95em;
-  margin-bottom: 6px;
-  min-height: 42px;
-}
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 16px;
+    }
 
-.card .price {
-  padding: 0 10px 10px 10px;
-  color: #22c55e;
-  font-weight: bold;
-  font-size: 1em;
-}
+    .time {
+        font-weight: 500;
+    }
 
-/* MARKET SUMMARY CARD */
-.summary {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  justify-content: space-around;
-  background: rgba(2,6,23,0.95);
-  border: 2px solid #22c55e;
-  border-radius: 16px;
-  padding: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 15px #22c55e;
-}
-
-.summary div {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9em;
-  text-align: center;
-}
-
-.summary div .price {
-  font-size: 1em;
-}
-
-/* LOADER */
-.loader {
-  margin-top: 15px;
-  font-size: 0.9em;
-  opacity: 0.8;
-}
-
-/* BACKGROUND GRID */
-.grid {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-image: linear-gradient(#0ff1 1px, transparent 1px),
-                    linear-gradient(90deg, #0ff1 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: -1;
-  animation: moveGrid 10s linear infinite;
-}
-
-@keyframes moveGrid {
-  from { transform: translateY(0); }
-  to { transform: translateY(40px); }
-}
-
-/* MOBILE OPTIMIZATION */
-@media (max-width: 400px) {
-  h1 { font-size: 1.8em; }
-  .card img { height: 140px; }
-  .card .title { font-size: 0.85em; min-height: 36px; }
-  .summary { flex-direction: column; gap: 8px; padding: 10px; }
-}
+    .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: var(--muted);
+    }
 </style>
 </head>
 
 <body>
-<div class="grid"></div>
 
-<h1>Neon Slab 🔮</h1>
+<div class="container">
+    <h1>🌿 Feeding Tracker</h1>
+    <p>Tap below after a feeding to see upcoming times</p>
 
-<div class="search-container">
-  <input id="searchInput" placeholder="Search cards (e.g. 'Jordan rookie PSA')" />
+    <div class="card">
+        <button onclick="calculateFeedTimes()">Log Feeding</button>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <div class="footer">
+        Calm. Simple. On schedule.
+    </div>
 </div>
 
-<div class="loader" id="loader"></div>
-<div class="results" id="results"></div>
-
 <script>
-const input = document.getElementById("searchInput");
-const resultsEl = document.getElementById("results");
-const loader = document.getElementById("loader");
+function formatTime(date) {
+    return date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+}
 
-// API call placeholder (commented for now)
-// const PROXY = "https://corsproxy.io/?";
+function calculateFeedTimes() {
+    const now = new Date();
+    const resultsDiv = document.getElementById("results");
 
-input.addEventListener("keypress", async (e) => {
-  if (e.key === "Enter") {
-    searchCards(input.value);
-  }
-});
+    const intervals = [1, 2, 3, 4, 5];
 
-async function searchCards(query) {
-  resultsEl.innerHTML = "";
-  loader.innerText = "Scanning the marketplace...";
+    let html = "";
 
-  // 🚫 REAL API CALL COMMENTED
-  /*
-  try {
-    const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_Sold=1&LH_Complete=1`;
-    const res = await fetch(PROXY + encodeURIComponent(ebayUrl));
-    const html = await res.text();
-    // parse html...
-  } catch(err) {
-    loader.innerText = "Error accessing data stream ⚠️";
-    console.error(err);
-  }
-  */
+    intervals.forEach(hour => {
+        const next = new Date(now.getTime() + hour * 60 * 60 * 1000);
 
-  // ✅ DUMMY DATA FOR NOW
-  const dummyData = [
-    {title:"Michael Jordan 1986 Fleer PSA 9", price:"$15,200", img:"https://picsum.photos/300/200?random=1"},
-    {title:"LeBron James Rookie PSA 10", price:"$2,500", img:"https://picsum.photos/300/200?random=2"},
-    {title:"Kobe Bryant Topps Rookie PSA 10", price:"$3,300", img:"https://picsum.photos/300/200?random=3"},
-    {title:"Tom Brady Rookie PSA 10", price:"$4,200", img:"https://picsum.photos/300/200?random=4"},
-    {title:"Shohei Ohtani Rookie Auto", price:"$1,800", img:"https://picsum.photos/300/200?random=5"},
-    {title:"Patrick Mahomes Rookie Patch Auto", price:"$5,500", img:"https://picsum.photos/300/200?random=6"}
-  ];
+        html += `
+            <div class="result-item">
+                <span>${hour} hour${hour > 1 ? "s" : ""}</span>
+                <span class="time">${formatTime(next)}</span>
+            </div>
+        `;
+    });
 
-  await new Promise(r => setTimeout(r, 400));
-  loader.innerText = "";
-
-  const filtered = dummyData.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
-  if(filtered.length===0){ loader.innerText="No slabs found..."; return; }
-
-  const prices = filtered.map(c=>parseFloat(c.price.replace(/[$,]/g,'')));
-  prices.sort((a,b)=>a-b);
-  const avg = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(0);
-  const median = prices.length % 2 ? prices[Math.floor(prices.length/2)] : ((prices[prices.length/2-1]+prices[prices.length/2])/2).toFixed(0);
-
-  // Market summary
-  const summary = document.createElement("div");
-  summary.className="summary";
-  summary.innerHTML=`
-    <div><div>AVG</div><div class="price">$${avg}</div></div>
-    <div><div>MEDIAN</div><div class="price">$${median}</div></div>
-    <div><div>SALES</div><div class="price">${prices.length}</div></div>
-  `;
-  resultsEl.appendChild(summary);
-
-  filtered.forEach(card=>{
-    const div=document.createElement("div");
-    div.className="card";
-    div.innerHTML=`
-      <img src="${card.img}" />
-      <div class="title">${card.title}</div>
-      <div class="price">${card.price}</div>
-    `;
-    resultsEl.appendChild(div);
-  });
+    resultsDiv.innerHTML = html;
 }
 </script>
+
 </body>
 </html>
