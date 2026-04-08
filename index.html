@@ -51,20 +51,32 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
 
-    button, select {
+    button {
         background: var(--primary);
         color: white;
         border: none;
-        border-radius: 10px;
-        padding: 12px;
+        border-radius: 12px;
+        padding: 14px;
         width: 100%;
+        font-size: 16px;
+        cursor: pointer;
         margin-top: 10px;
-        font-size: 15px;
     }
 
     button:hover { background: var(--secondary); }
 
-    .results, .history {
+    .icon-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin: 0 auto 10px auto;
+    }
+
+    .results {
         margin-top: 20px;
         text-align: left;
     }
@@ -74,35 +86,45 @@
         justify-content: space-between;
         padding: 8px 0;
         border-bottom: 1px solid #eee;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeIn 0.4s ease forwards;
     }
 
-    .small { font-size: 13px; color: var(--muted); }
+    .result-item:nth-child(1) { animation-delay: 0.05s; }
+    .result-item:nth-child(2) { animation-delay: 0.1s; }
+    .result-item:nth-child(3) { animation-delay: 0.15s; }
+    .result-item:nth-child(4) { animation-delay: 0.2s; }
+    .result-item:nth-child(5) { animation-delay: 0.25s; }
+    .result-item:nth-child(6) { animation-delay: 0.3s; }
+    .result-item:nth-child(7) { animation-delay: 0.35s; }
+    .result-item:nth-child(8) { animation-delay: 0.4s; }
+    .result-item:nth-child(9) { animation-delay: 0.45s; }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .small { font-size: 13px; color: var(--muted); margin-top: 10px; }
 </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🌿 Feeding Tracker</h1>
-    <p>Simple + calm scheduling</p>
+    <p>Tap once. Stay simple.</p>
 
     <div class="card">
+        <button class="icon-btn" onclick="toggleDarkMode()">🌙</button>
+
         <button onclick="logFeeding()">Log Feeding</button>
 
         <div class="small" id="lastFed"></div>
 
-        <select id="intervalSelect">
-            <option value="1">1 hour</option>
-            <option value="2">2 hours</option>
-            <option value="3" selected>3 hours</option>
-            <option value="4">4 hours</option>
-            <option value="5">5 hours</option>
-        </select>
-
-        <button onclick="toggleDarkMode()">Toggle Night Mode</button>
-
         <div class="results" id="results"></div>
-
-        <div class="history" id="history"></div>
     </div>
 </div>
 
@@ -111,53 +133,21 @@ function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function saveHistory(time) {
-    let history = JSON.parse(localStorage.getItem("feedHistory") || "[]");
-    history.unshift(time);
-    history = history.slice(0, 10);
-    localStorage.setItem("feedHistory", JSON.stringify(history));
-    renderHistory();
-}
-
-function renderHistory() {
-    const history = JSON.parse(localStorage.getItem("feedHistory") || "[]");
-    const container = document.getElementById("history");
-
-    container.innerHTML = "<h4>Recent Feedings</h4>" + history.map(t => `<div class="small">${t}</div>`).join("");
-}
-
-function scheduleNotification(nextTime) {
-    if (Notification.permission === "granted") {
-        const delay = nextTime - new Date();
-        setTimeout(() => {
-            new Notification("Feeding Reminder 🍼", {
-                body: "Time for the next feeding"
-            });
-        }, delay);
-    }
-}
-
 function logFeeding() {
     const now = new Date();
-    const interval = parseInt(document.getElementById("intervalSelect").value);
 
     document.getElementById("lastFed").innerText = "Last fed at: " + formatTime(now);
     localStorage.setItem("lastFed", now);
 
-    saveHistory(formatTime(now));
-
     const resultsDiv = document.getElementById("results");
-    const intervals = [1,2,3,4,5];
+
+    const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
 
     let html = "";
 
     intervals.forEach(hour => {
         const next = new Date(now.getTime() + hour * 3600000);
         html += `<div class="result-item"><span>${hour} hr</span><span>${formatTime(next)}</span></div>`;
-
-        if (hour === interval) {
-            scheduleNotification(next);
-        }
     });
 
     resultsDiv.innerHTML = html;
@@ -177,12 +167,6 @@ function init() {
     if (localStorage.getItem("darkMode") === "true") {
         document.body.classList.add("dark");
     }
-
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-
-    renderHistory();
 }
 
 init();
