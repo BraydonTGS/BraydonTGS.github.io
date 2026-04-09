@@ -111,6 +111,18 @@ button.main:active { transform: scale(0.97); }
     font-size: 20px;
     font-weight: 600;
 }
+
+/* 🔔 Pulse animation */
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(122,143,123, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0); }
+}
+
+.timer.done {
+    color: var(--primary);
+    animation: pulse 1.5s infinite;
+}
 </style>
 </head>
 <body>
@@ -137,7 +149,6 @@ button.main:active { transform: scale(0.97); }
 const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
 let countdownInterval;
 
-// Get default interval
 function getDefaultInterval() {
     return parseFloat(localStorage.getItem("defaultInterval")) || 1;
 }
@@ -146,7 +157,6 @@ function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-// Format countdown HH:MM:SS
 function formatCountdown(ms) {
     const totalSeconds = Math.floor(ms / 1000);
     const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
@@ -163,7 +173,6 @@ function logFeeding() {
     startCountdown(now);
 }
 
-// Render list
 function renderResults(baseTime) {
     const resultsDiv = document.getElementById("results");
     const defaultInterval = getDefaultInterval();
@@ -189,7 +198,6 @@ function renderResults(baseTime) {
     });
 }
 
-// Set default interval
 function setDefault(hour) {
     localStorage.setItem("defaultInterval", hour);
     const lastFed = localStorage.getItem("lastFed");
@@ -201,24 +209,25 @@ function setDefault(hour) {
     }
 }
 
-// Start countdown timer
 function startCountdown(baseTime) {
     clearInterval(countdownInterval);
 
     const intervalHours = getDefaultInterval();
     const targetTime = new Date(baseTime.getTime() + intervalHours * 3600000);
+    const timerEl = document.getElementById("countdown");
 
     function update() {
         const now = new Date();
         const diff = targetTime - now;
 
         if (diff <= 0) {
-            document.getElementById("countdown").innerText = "Time to feed!";
-            clearInterval(countdownInterval);
+            timerEl.innerText = "Time to feed!";
+            timerEl.classList.add("done");
             return;
         }
 
-        document.getElementById("countdown").innerText = formatCountdown(diff);
+        timerEl.classList.remove("done");
+        timerEl.innerText = formatCountdown(diff);
     }
 
     update();
@@ -228,7 +237,11 @@ function startCountdown(baseTime) {
 function clearAll() {
     localStorage.removeItem("lastFed");
     document.getElementById("results").innerHTML = "";
-    document.getElementById("countdown").innerText = "--:--:--";
+
+    const timerEl = document.getElementById("countdown");
+    timerEl.innerText = "--:--:--";
+    timerEl.classList.remove("done");
+
     clearInterval(countdownInterval);
 }
 
