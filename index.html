@@ -105,13 +105,18 @@ button.main:active { transform: scale(0.97); }
     background: var(--primary);
     color: white;
 }
+
+.timer {
+    margin-top: 16px;
+    font-size: 20px;
+    font-weight: 600;
+}
 </style>
 </head>
 <body>
 
 <div class="top-actions">
     <button class="icon-btn" onclick="clearAll()">🔄</button>
-    <button class="icon-btn" id="notifBtn" onclick="requestNotif()">🔕</button>
     <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
 </div>
 
@@ -121,21 +126,33 @@ button.main:active { transform: scale(0.97); }
 
     <div class="card">
         <button class="main" onclick="logFeeding()">Log Feeding</button>
+
+        <div class="timer" id="countdown">--:--:--</div>
+
         <div class="results" id="results"></div>
     </div>
 </div>
 
 <script>
 const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
-let notifTimeout;
+let countdownInterval;
 
-// ✅ Always return a default interval if not set
+// Get default interval
 function getDefaultInterval() {
     return parseFloat(localStorage.getItem("defaultInterval")) || 1;
 }
 
 function formatTime(date) {
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: undefined });
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
+// Format countdown HH:MM:SS
+function formatCountdown(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const s = String(totalSeconds % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
 }
 
 function logFeeding() {
@@ -143,17 +160,16 @@ function logFeeding() {
     localStorage.setItem("lastFed", now);
 
     renderResults(now);
-    scheduleNotification(now);
+    startCountdown(now);
 }
 
-// ✅ Render results with "Now" first and highlight default interval
+// Render list
 function renderResults(baseTime) {
     const resultsDiv = document.getElementById("results");
     const defaultInterval = getDefaultInterval();
 
     resultsDiv.innerHTML = "";
 
-    // "Now" row
     const nowDiv = document.createElement("div");
     nowDiv.className = "result-item";
     nowDiv.innerHTML = `<span>Last Fed</span><span>${formatTime(baseTime)}</span>`;
@@ -173,56 +189,47 @@ function renderResults(baseTime) {
     });
 }
 
-// ✅ Set default interval and refresh results
+// Set default interval
 function setDefault(hour) {
     localStorage.setItem("defaultInterval", hour);
     const lastFed = localStorage.getItem("lastFed");
+
     if (lastFed) {
-        renderResults(new Date(lastFed));
-        scheduleNotification(new Date(lastFed));
+        const base = new Date(lastFed);
+        renderResults(base);
+        startCountdown(base);
     }
 }
 
-// ✅ Notification icon handling
-function updateNotifIcon() {
-    const btn = document.getElementById("notifBtn");
-    btn.innerText = Notification.permission === "granted" ? "🔔" : "🔕";
-}
+// Start countdown timer
+function startCountdown(baseTime) {
+    clearInterval(countdownInterval);
 
-function requestNotif() {
-    if (Notification.permission === "default") {
-        Notification.requestPermission().then(updateNotifIcon);
-    } else {
-        updateNotifIcon();
-    }
-}
+    const intervalHours = getDefaultInterval();
+    const targetTime = new Date(baseTime.getTime() + intervalHours * 3600000);
 
-// ✅ Schedule notification 15 minutes before next feed
-function scheduleNotification(baseTime) {
-    clearTimeout(notifTimeout);
-    const interval = getDefaultInterval();
-    if (!interval) return;
+    function update() {
+        const now = new Date();
+        const diff = targetTime - now;
 
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(updateNotifIcon);
-        return;
+        if (diff <= 0) {
+            document.getElementById("countdown").innerText = "Time to feed!";
+            clearInterval(countdownInterval);
+            return;
+        }
+
+        document.getElementById("countdown").innerText = formatCountdown(diff);
     }
 
-    const nextFeed = new Date(baseTime.getTime() + interval * 3600000);
-    const notifyTime = new Date(nextFeed.getTime() - 15 * 60000); // 15 min before
-    const delay = notifyTime - new Date();
-
-    if (delay <= 0) return; // already passed
-
-    notifTimeout = setTimeout(() => {
-        new Notification("🌿 Time to feed in 15 minutes!");
-    }, delay);
+    update();
+    countdownInterval = setInterval(update, 1000);
 }
 
 function clearAll() {
-    localStorage.removeItem("lastFed"); // keep default interval
+    localStorage.removeItem("lastFed");
     document.getElementById("results").innerHTML = "";
-    clearTimeout(notifTimeout);
+    document.getElementById("countdown").innerText = "--:--:--";
+    clearInterval(countdownInterval);
 }
 
 function toggleDarkMode() {
@@ -236,16 +243,17 @@ function init() {
     const lastFed = localStorage.getItem("lastFed");
 
     if (lastFed) {
-        renderResults(new Date(lastFed));
-        scheduleNotification(new Date(lastFed));
+        const base = new Date(lastFed);
+        renderResults(base);
+        startCountdown(base);
     }
 
     if (localStorage.getItem("darkMode") === "true") {
         document.body.classList.add("dark");
     }
 
-    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
-    updateNotifIcon();
+    document.getElementById("themeBtn").innerText =
+        document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 init();
