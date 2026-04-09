@@ -43,6 +43,16 @@ body {
     z-index: 1000;
 }
 
+/* ✅ NEW: top-left title */
+.top-title {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    font-size: 24px;
+    font-weight: 600;
+    z-index: 1000;
+}
+
 .icon-btn {
     width: 40px;
     height: 40px;
@@ -128,7 +138,11 @@ button.main:active { transform: scale(0.97); }
 }
 </style>
 </head>
+
 <body>
+
+<!-- ✅ moved title -->
+<div class="top-title">🌿 Next Feed</div>
 
 <div class="top-actions">
     <button class="icon-btn" onclick="clearAll()">🔄</button>
@@ -136,7 +150,6 @@ button.main:active { transform: scale(0.97); }
 </div>
 
 <div class="container">
-    <h1>🌿 Next Feed</h1>
     <p>Tap once. Stay simple.</p>
 
     <div class="card">
@@ -274,13 +287,11 @@ function init() {
 
 init();
     
-// Register service worker (required for install)
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js");
     });
 }
-    
 </script>
 
 </body>
