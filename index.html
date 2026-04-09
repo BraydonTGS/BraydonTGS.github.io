@@ -7,280 +7,296 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#7a8f7b">
 <link rel="apple-touch-icon" href="icon-192.png">
-    
+
 <style>
 :root {
-    --bg: #f4f1ea;
-    --card: #ffffff;
-    --primary: #7a8f7b;
-    --secondary: #a3b18a;
-    --text: #3a3a3a;
-    --muted: #7d7d7d;
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --primary: #7a8f7b;
+  --secondary: #a3b18a;
+  --text: #3a3a3a;
+  --muted: #7d7d7d;
 }
 
 body.dark {
-    --bg: #1f2a24;
-    --card: #2c3a33;
-    --primary: #a3b18a;
-    --secondary: #7a8f7b;
-    --text: #f1f1f1;
-    --muted: #cfcfcf;
+  --bg: #1f2a24;
+  --card: #2c3a33;
+  --primary: #a3b18a;
+  --secondary: #7a8f7b;
+  --text: #f1f1f1;
+  --muted: #cfcfcf;
 }
 
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.top-actions {
-    position: fixed;
-    top: 12px;
-    right: 16px;
-    display: flex;
-    gap: 8px;
-    z-index: 1000;
+.top-bar {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.top-bar .title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.top-bar .actions {
+  display: flex;
+  gap: 8px;
 }
 
 .icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-    background: var(--card);
-    color: var(--text);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .container {
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    margin: 80px auto 20px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  margin: 80px auto 20px;
 }
 
-h1 { margin-bottom: 10px; }
-p { color: var(--muted); }
+p {
+  color: var(--muted);
+}
 
 .card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 button.main {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    width: 100%;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
-button.main:hover { background: var(--secondary); }
-button.main:active { transform: scale(0.97); }
+button.main:hover {
+  background: var(--secondary);
+}
+
+button.main:active {
+  transform: scale(0.97);
+}
 
 .results {
-    margin-top: 16px;
-    text-align: left;
+  margin-top: 16px;
+  text-align: left;
 }
 
 .result-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 10px;
-    border-radius: 10px;
-    margin-bottom: 4px;
-    cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  cursor: pointer;
 }
 
 .result-item.selected {
-    background: var(--primary);
-    color: white;
+  background: var(--primary);
+  color: white;
 }
 
 .timer {
-    margin-top: 16px;
-    font-size: 20px;
-    font-weight: 600;
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
-/* 🔔 Pulse animation */
 @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(122,143,123, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0); }
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(122,143,123, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0); }
 }
 
 .timer.done {
-    color: var(--primary);
-    animation: pulse 1.5s infinite;
+  color: var(--primary);
+  animation: pulse 1.5s infinite;
 }
 </style>
 </head>
+
 <body>
 
-<div class="top-actions">
+<div class="top-bar">
+  <div class="title">🌿 Next Feed</div>
+  <div class="actions">
     <button class="icon-btn" onclick="clearAll()">🔄</button>
     <button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+  </div>
 </div>
 
 <div class="container">
-    <h1>🌿 Next Feed</h1>
-    <p>Tap once. Stay simple.</p>
+  <p>Tap once. Stay simple.</p>
 
-    <div class="card">
-        <button class="main" onclick="logFeeding()">Log Feeding</button>
-
-        <div class="timer" id="countdown">--:--:--</div>
-
-        <div class="results" id="results"></div>
-    </div>
+  <div class="card">
+    <button class="main" onclick="logFeeding()">Log Feeding</button>
+    <div class="timer" id="countdown">--:--:--</div>
+    <div class="results" id="results"></div>
+  </div>
 </div>
 
 <script>
-const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5];
+const intervals = [1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6];
 let countdownInterval;
 
 function getDefaultInterval() {
-    return parseFloat(localStorage.getItem("defaultInterval")) || 1;
+  return parseFloat(localStorage.getItem("defaultInterval")) || 1;
 }
 
 function formatTime(date) {
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
 function formatCountdown(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-    const s = String(totalSeconds % 60).padStart(2, '0');
-    return `${h}:${m}:${s}`;
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const s = String(totalSeconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
 }
 
 function logFeeding() {
-    const now = new Date();
-    localStorage.setItem("lastFed", now);
-
-    renderResults(now);
-    startCountdown(now);
+  const now = new Date();
+  localStorage.setItem("lastFed", now);
+  renderResults(now);
+  startCountdown(now);
 }
 
 function renderResults(baseTime) {
-    const resultsDiv = document.getElementById("results");
-    const defaultInterval = getDefaultInterval();
+  const resultsDiv = document.getElementById("results");
+  const defaultInterval = getDefaultInterval();
+  resultsDiv.innerHTML = "";
 
-    resultsDiv.innerHTML = "";
+  const nowDiv = document.createElement("div");
+  nowDiv.className = "result-item";
+  nowDiv.innerHTML = `<span>Last Fed</span><span>${baseTime ? formatTime(baseTime) : "--:--"}</span>`;
+  resultsDiv.appendChild(nowDiv);
 
-    const nowDiv = document.createElement("div");
-    nowDiv.className = "result-item";
-    nowDiv.innerHTML = `<span>Last Fed</span><span>${formatTime(baseTime)}</span>`;
-    resultsDiv.appendChild(nowDiv);
+  intervals.forEach(hour => {
+    const div = document.createElement("div");
+    div.className = "result-item";
 
-    intervals.forEach(hour => {
-        const next = new Date(baseTime.getTime() + hour * 3600000);
-        const div = document.createElement("div");
+    if (hour === defaultInterval) div.classList.add("selected");
 
-        div.className = "result-item";
-        if (hour === defaultInterval) div.classList.add("selected");
+    let timeDisplay = "--:--";
+    if (baseTime) {
+      const next = new Date(baseTime.getTime() + hour * 3600000);
+      timeDisplay = formatTime(next);
+    }
 
-        div.innerHTML = `<span>${hour} hr</span><span>${formatTime(next)}</span>`;
-        div.onclick = () => setDefault(hour);
+    div.innerHTML = `<span>${hour} hr</span><span>${timeDisplay}</span>`;
+    div.onclick = () => setDefault(hour);
 
-        resultsDiv.appendChild(div);
-    });
+    resultsDiv.appendChild(div);
+  });
 }
 
 function setDefault(hour) {
-    localStorage.setItem("defaultInterval", hour);
-    const lastFed = localStorage.getItem("lastFed");
+  localStorage.setItem("defaultInterval", hour);
+  const lastFed = localStorage.getItem("lastFed");
+  const base = lastFed ? new Date(lastFed) : null;
 
-    if (lastFed) {
-        const base = new Date(lastFed);
-        renderResults(base);
-        startCountdown(base);
-    }
+  renderResults(base);
+  if (base) startCountdown(base);
 }
 
 function startCountdown(baseTime) {
-    clearInterval(countdownInterval);
+  clearInterval(countdownInterval);
 
-    const intervalHours = getDefaultInterval();
-    const targetTime = new Date(baseTime.getTime() + intervalHours * 3600000);
-    const timerEl = document.getElementById("countdown");
+  const intervalHours = getDefaultInterval();
+  const targetTime = new Date(baseTime.getTime() + intervalHours * 3600000);
+  const timerEl = document.getElementById("countdown");
 
-    function update() {
-        const now = new Date();
-        const diff = targetTime - now;
+  function update() {
+    const now = new Date();
+    const diff = targetTime - now;
 
-        if (diff <= 0) {
-            timerEl.innerText = "Time to feed!";
-            timerEl.classList.add("done");
-            return;
-        }
-
-        timerEl.classList.remove("done");
-        timerEl.innerText = formatCountdown(diff);
+    if (diff <= 0) {
+      timerEl.innerText = "Time to feed!";
+      timerEl.classList.add("done");
+      return;
     }
 
-    update();
-    countdownInterval = setInterval(update, 1000);
+    timerEl.classList.remove("done");
+    timerEl.innerText = formatCountdown(diff);
+  }
+
+  update();
+  countdownInterval = setInterval(update, 1000);
 }
 
 function clearAll() {
-    localStorage.removeItem("lastFed");
-    document.getElementById("results").innerHTML = "";
+  localStorage.removeItem("lastFed");
+  renderResults(null);
 
-    const timerEl = document.getElementById("countdown");
-    timerEl.innerText = "--:--:--";
-    timerEl.classList.remove("done");
+  const timerEl = document.getElementById("countdown");
+  timerEl.innerText = "--:--:--";
+  timerEl.classList.remove("done");
 
-    clearInterval(countdownInterval);
+  clearInterval(countdownInterval);
 }
 
 function toggleDarkMode() {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("darkMode", isDark);
-    document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("darkMode", isDark);
+  document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
 }
 
 function init() {
-    const lastFed = localStorage.getItem("lastFed");
+  const lastFed = localStorage.getItem("lastFed");
+  const base = lastFed ? new Date(lastFed) : null;
 
-    if (lastFed) {
-        const base = new Date(lastFed);
-        renderResults(base);
-        startCountdown(base);
-    }
+  renderResults(base);
 
-    if (localStorage.getItem("darkMode") === "true") {
-        document.body.classList.add("dark");
-    }
+  if (base) startCountdown(base);
 
-    document.getElementById("themeBtn").innerText =
-        document.body.classList.contains("dark") ? "☀️" : "🌙";
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark");
+  }
+
+  document.getElementById("themeBtn").innerText =
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 init();
-    
-// Register service worker (required for install)
+
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js");
-    });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js");
+  });
 }
-    
 </script>
 
 </body>
