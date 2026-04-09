@@ -78,17 +78,12 @@ body {
     height: 20px;
 }
 
-/* TREE ICON */
-.title-icon {
-    width: 22px;
-    height: 22px;
-}
-
 .container {
     width: 90%;
     max-width: 420px;
     text-align: center;
-    margin: 80px auto 20px;
+    margin: 80px auto 0;
+    min-height: calc(100vh - 100px);
 }
 
 p {
@@ -101,6 +96,9 @@ p {
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
 }
 
 button.main {
@@ -118,9 +116,20 @@ button.main {
 button.main:hover { background: var(--secondary); }
 button.main:active { transform: scale(0.97); }
 
+.timer {
+    margin-top: 16px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.timer.warn { color: #e6c200; }
+.timer.danger { color: #ff4d4d; }
+
 .results {
     margin-top: 16px;
     text-align: left;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .result-item {
@@ -136,38 +145,12 @@ button.main:active { transform: scale(0.97); }
     background: var(--primary);
     color: white;
 }
-
-.timer {
-    margin-top: 16px;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(122,143,123, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122,143,123, 0); }
-}
-
-.timer.done {
-    color: var(--primary);
-    animation: pulse 1.5s infinite;
-}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="top-title">
-    <!-- your SVG icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/>
-        <path d="M7 16v6"/>
-        <path d="M13 19v3"/>
-        <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/>
-    </svg>
-
     Next Feed
 </div>
 
@@ -207,6 +190,13 @@ function formatCountdown(ms) {
     const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
     const s = String(totalSeconds % 60).padStart(2, '0');
     return `${h}:${m}:${s}`;
+}
+
+/* 🔔 Notification helper */
+function notify(msg) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("Next Feed", { body: msg });
+    }
 }
 
 function logFeeding() {
@@ -253,41 +243,44 @@ function setDefault(hour) {
     }
 }
 
-/* FIXED DARK MODE (no icon bugs) */
-function toggleDarkMode() {
-    const isDark = document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode", isDark);
-    updateThemeIcon(isDark);
-}
-
-function updateThemeIcon(isDark) {
-    const btn = document.getElementById("themeBtn");
-
-    btn.innerHTML = isDark
-        ? `<i data-lucide="sun"></i>`
-        : `<i data-lucide="moon"></i>`;
-
-    lucide.createIcons();
-}
-
+/* 🔥 MAIN TIMER + NOTIFICATIONS */
 function startCountdown(baseTime) {
     clearInterval(countdownInterval);
 
     const intervalHours = getDefaultInterval();
     const targetTime = new Date(baseTime.getTime() + intervalHours * 3600000);
+
     const timerEl = document.getElementById("countdown");
+
+    let fired = {
+        30: false,
+        15: false,
+        10: false,
+        5: false
+    };
 
     function update() {
         const now = new Date();
         const diff = targetTime - now;
+        const minutes = Math.floor(diff / 60000);
+
+        // 🔔 alerts
+        if (minutes <= 30 && !fired[30]) { notify("30 minutes remaining"); fired[30] = true; }
+        if (minutes <= 15 && !fired[15]) { notify("15 minutes remaining"); fired[15] = true; }
+        if (minutes <= 10 && !fired[10]) { notify("10 minutes remaining"); fired[10] = true; }
+        if (minutes <= 5 && !fired[5]) { notify("5 minutes remaining"); fired[5] = true; }
+
+        // UI states
+        timerEl.classList.remove("warn", "danger");
+
+        if (minutes <= 10) timerEl.classList.add("danger");
+        else if (minutes <= 30) timerEl.classList.add("warn");
 
         if (diff <= 0) {
             timerEl.innerText = "Time to feed!";
-            timerEl.classList.add("done");
             return;
         }
 
-        timerEl.classList.remove("done");
         timerEl.innerText = formatCountdown(diff);
     }
 
@@ -298,20 +291,27 @@ function startCountdown(baseTime) {
 function clearAll() {
     localStorage.removeItem("lastFed");
     document.getElementById("results").innerHTML = "";
-
-    const timerEl = document.getElementById("countdown");
-    timerEl.innerText = "--:--:--";
-    timerEl.classList.remove("done");
+    document.getElementById("countdown").innerText = "--:--:--";
     clearInterval(countdownInterval);
+}
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", isDark);
+    updateThemeIcon(isDark);
+}
+
+function updateThemeIcon(isDark) {
+    const btn = document.getElementById("themeBtn");
+    btn.innerHTML = `<i data-lucide="${isDark ? "sun" : "moon"}"></i>`;
+    lucide.createIcons();
 }
 
 function init() {
     const isDark = localStorage.getItem("darkMode") === "true";
-
     if (isDark) document.body.classList.add("dark");
 
     updateThemeIcon(isDark);
-
     lucide.createIcons();
 
     const lastFed = localStorage.getItem("lastFed");
@@ -320,6 +320,11 @@ function init() {
         const base = new Date(lastFed);
         renderResults(base);
         startCountdown(base);
+    }
+
+    // 🔔 request permission
+    if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
     }
 }
 
