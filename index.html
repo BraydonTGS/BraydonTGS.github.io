@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#7a8f7b">
 <link rel="apple-touch-icon" href="icon-192.png">
 
-<!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
@@ -37,15 +36,7 @@ body {
     color: var(--text);
 }
 
-.top-actions {
-    position: fixed;
-    top: 12px;
-    right: 16px;
-    display: flex;
-    gap: 8px;
-    z-index: 1000;
-}
-
+/* HEADER */
 .top-title {
     position: fixed;
     top: 12px;
@@ -53,8 +44,18 @@ body {
     height: 40px;
     display: flex;
     align-items: center;
+    gap: 8px;
     font-size: 24px;
     font-weight: 600;
+    z-index: 1000;
+}
+
+.top-actions {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
     z-index: 1000;
 }
 
@@ -75,6 +76,12 @@ body {
 .icon-btn i {
     width: 20px;
     height: 20px;
+}
+
+/* TREE ICON */
+.title-icon {
+    width: 22px;
+    height: 22px;
 }
 
 .container {
@@ -151,7 +158,18 @@ button.main:active { transform: scale(0.97); }
 
 <body>
 
-<div class="top-title">Next Feed</div>
+<!-- HEADER -->
+<div class="top-title">
+    <!-- your SVG icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/>
+        <path d="M7 16v6"/>
+        <path d="M13 19v3"/>
+        <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/>
+    </svg>
+
+    Next Feed
+</div>
 
 <div class="top-actions">
     <button class="icon-btn" onclick="clearAll()">
@@ -235,6 +253,23 @@ function setDefault(hour) {
     }
 }
 
+/* FIXED DARK MODE (no icon bugs) */
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", isDark);
+    updateThemeIcon(isDark);
+}
+
+function updateThemeIcon(isDark) {
+    const btn = document.getElementById("themeBtn");
+
+    btn.innerHTML = isDark
+        ? `<i data-lucide="sun"></i>`
+        : `<i data-lucide="moon"></i>`;
+
+    lucide.createIcons();
+}
+
 function startCountdown(baseTime) {
     clearInterval(countdownInterval);
 
@@ -267,24 +302,18 @@ function clearAll() {
     const timerEl = document.getElementById("countdown");
     timerEl.innerText = "--:--:--";
     timerEl.classList.remove("done");
-
     clearInterval(countdownInterval);
 }
 
-/* ✅ FIXED ICON TOGGLE */
-function toggleDarkMode() {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
+function init() {
+    const isDark = localStorage.getItem("darkMode") === "true";
 
-    localStorage.setItem("darkMode", isDark);
+    if (isDark) document.body.classList.add("dark");
 
-    const btn = document.getElementById("themeBtn");
-    btn.innerHTML = `<i data-lucide="${isDark ? "sun" : "moon"}"></i>`;
+    updateThemeIcon(isDark);
 
     lucide.createIcons();
-}
 
-function init() {
     const lastFed = localStorage.getItem("lastFed");
 
     if (lastFed) {
@@ -292,17 +321,6 @@ function init() {
         renderResults(base);
         startCountdown(base);
     }
-
-    const isDark = localStorage.getItem("darkMode") === "true";
-
-    const btn = document.getElementById("themeBtn");
-    btn.innerHTML = `<i data-lucide="${isDark ? "sun" : "moon"}"></i>`;
-
-    if (isDark) {
-        document.body.classList.add("dark");
-    }
-
-    lucide.createIcons();
 }
 
 init();
